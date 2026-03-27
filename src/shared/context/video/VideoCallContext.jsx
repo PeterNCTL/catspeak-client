@@ -198,6 +198,7 @@ export const VideoCallContent = ({
     setShowParticipants,
     user,
     currentUserId: user?.accountId,
+    localParticipantId: localParticipant?.id,
     session,
     room,
     sessionError,

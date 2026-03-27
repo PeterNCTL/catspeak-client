@@ -8,6 +8,7 @@ import TextInput from "@/shared/components/ui/inputs/TextInput"
 const ChatBox = ({
   messages,
   currentUser,
+  localParticipantId,
   onSendMessage,
   isConnected,
   className = "",
@@ -83,7 +84,8 @@ const ChatBox = ({
 
             const isMe =
               String(msg.senderId) === String(currentUser?.accountId) ||
-              String(msg.senderId) === String(currentUser?.id)
+              String(msg.senderId) === String(currentUser?.id) ||
+              String(msg.senderId) === String(localParticipantId)
             const senderName = isMe
               ? t.rooms.chatBox.you
               : msg.senderName || `User ${msg.senderId}`

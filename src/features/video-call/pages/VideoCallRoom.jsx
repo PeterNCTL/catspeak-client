@@ -29,6 +29,7 @@ const VideoCallRoomContent = () => {
     setShowParticipants,
     user,
     currentUserId,
+    localParticipantId,
     session,
     participantIds,
     messages,
@@ -159,6 +160,7 @@ const VideoCallRoomContent = () => {
               <ChatBox
                 messages={messages}
                 currentUser={user}
+                localParticipantId={localParticipantId}
                 onSendMessage={handleSendMessage}
                 isConnected={isConnected}
                 className="h-full w-full"
@@ -211,6 +213,7 @@ const VideoCallRoomContent = () => {
                     <ChatBox
                       messages={messages}
                       currentUser={user}
+                      localParticipantId={localParticipantId}
                       onSendMessage={handleSendMessage}
                       isConnected={isConnected}
                       className="h-full w-full"
