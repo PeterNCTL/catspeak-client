@@ -19,6 +19,7 @@ export default {
     doYouHavePets: "你有养宠物吗？",
     schoolLife: "学校生活",
     whatILike: "我喜欢什么",
+    doYouLikeReading: "你喜欢读书吗？",
   },
   heroCarousel: {
     comingSoonTitle: "即将推出",

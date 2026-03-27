@@ -9,6 +9,15 @@ const __dirname = path.dirname(__filename)
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://api.catspeak.com.vn",
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
   build: {
     outDir: "dist",
     rollupOptions: {

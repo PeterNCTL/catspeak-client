@@ -21,6 +21,7 @@ export default {
     doYouHavePets: "Bạn có nuôi thú cưng không?",
     schoolLife: "Cuộc sống ở trường",
     whatILike: "Điều tôi thích!",
+    doYouLikeReading: "Bạn có thích đọc sách?",
   },
   heroCarousel: {
     comingSoonTitle: "Sắp ra mắt",

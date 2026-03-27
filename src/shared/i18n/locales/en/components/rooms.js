@@ -20,6 +20,7 @@ export default {
     doYouHavePets: "Do you have pets?",
     schoolLife: "School life",
     whatILike: "What I like!",
+    doYouLikeReading: "Do you like reading books?",
   },
   heroCarousel: {
     comingSoonTitle: "Coming Soon",

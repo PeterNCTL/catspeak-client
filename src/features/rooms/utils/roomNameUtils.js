@@ -28,5 +28,9 @@ export const getTranslatedRoomName = (name, t) => {
     return t.rooms.specialNames.whatILike || name;
   }
 
+  if (name === "你喜欢读书吗?" || name === "你喜欢读书吗？" || name === "Bạn có thích đọc sách?") {
+    return t.rooms.specialNames.doYouLikeReading || name;
+  }
+
   return name;
 };
