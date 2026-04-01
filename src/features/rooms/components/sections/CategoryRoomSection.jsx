@@ -91,7 +91,20 @@ const CategoryRoomSection = ({
     )
   }
 
-  if (!isLoading && rooms.length === 0) return null
+  if (!isLoading && rooms.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        {renderHeader()}
+
+        <EmptyRoomState
+          message={
+            t?.rooms?.filters?.noRoomsFoundCategory ||
+            "No rooms found in this category"
+          }
+        />
+      </div>
+    )
+  }
 
   // ── Mobile (≤425px): touch scroll, no buttons ──────────────────────────────
   if (isMobile) {

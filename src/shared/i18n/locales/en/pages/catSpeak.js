@@ -35,6 +35,7 @@ export default {
     discover: "Discover World",
     video: "Video",
     mail: "Mail",
+    schedules: "Schedules",
     settings: "Settings",
     report: "Report Log",
     help: "Help",

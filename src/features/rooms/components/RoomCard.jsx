@@ -17,7 +17,6 @@ import Animated3DCard from "@/shared/components/ui/animations/Animated3DCard"
 import { getTranslatedRoomName } from "../utils/roomNameUtils"
 
 const RoomCard = ({ room }) => {
-  console.log(room)
   const [searchParams] = useSearchParams()
   const { language, t } = useLanguage()
   const { isAuthenticated } = useAuth()

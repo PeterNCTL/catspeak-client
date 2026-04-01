@@ -5,6 +5,10 @@ export default {
     notFound: "Post not found",
     backToNews: "Back to News",
   },
+  viewMode: {
+    post: "Post View",
+    article: "Article View",
+  },
   newsDetail: {
     back: "Back",
     reactions: "reactions",

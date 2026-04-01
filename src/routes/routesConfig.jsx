@@ -19,6 +19,7 @@ import DiscoverPage from "@/features/discover/DiscoverPage"
 import VideoPage from "@/features/video/VideoPage"
 import MailPage from "@/features/mail/pages/MailPage"
 import SharedEventPage from "@/features/calendar/pages/SharedEventPage"
+import SchedulesPage from "@/features/calendar/pages/SchedulesPage"
 
 // Shared Pages
 import { ComingSoonPage } from "@/shared/pages"
@@ -118,6 +119,10 @@ const routesConfig = [
               {
                 path: "mail",
                 element: <MailPage />,
+              },
+              {
+                path: "schedules",
+                element: <SchedulesPage />,
               },
               { path: "*", element: <PageNotFound /> },
             ],

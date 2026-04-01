@@ -36,11 +36,11 @@ export function estimatePillHeight(charLen) {
  * @param {number} stageHeight - Current height of the danmaku stage in px
  * @returns {Array} Items augmented with _idx, _top, _duration, _delay
  */
-export function generateDanmakuItems(combinedStories, stageHeight) {
+export function generateDanmakuItems(combinedStories) {
   if (!combinedStories || combinedStories.length === 0) return []
 
-  // Scale item count to container height so it always feels full
-  const targetCount = Math.max(20, Math.floor(stageHeight / 25))
+  // Ensure plenty of items for a full-feeling screen
+  const targetCount = 30
   let items = [...combinedStories]
   while (items.length < targetCount) {
     items = [...items, ...combinedStories]
@@ -51,8 +51,10 @@ export function generateDanmakuItems(combinedStories, stageHeight) {
     const rand = seededRandom(idx * 7919 + contentHash * 13 + idx * idx + 31)
 
     const charLen = story.storyContent?.length || 0
-    const pillHeight = estimatePillHeight(charLen)
-    const top = Math.floor(rand() * Math.max(stageHeight - pillHeight, 0))
+    
+    // Instead of precise pixels dependent on container height, use percentage
+    // Random between 0 and 85% to ensure it doesn't overflow bottom
+    const topPercent = (rand() * 85).toFixed(2)
 
     const lengthFactor = 1 + charLen / 250 // longer text → slower
     const duration = (8 + rand() * 12) * lengthFactor // base 8–20s, scaled by length
@@ -61,7 +63,7 @@ export function generateDanmakuItems(combinedStories, stageHeight) {
     return {
       ...story,
       _idx: idx,
-      _top: top,
+      _top: `${topPercent}%`,
       _duration: duration,
       _delay: delay,
     }

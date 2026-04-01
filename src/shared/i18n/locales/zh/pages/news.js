@@ -5,6 +5,10 @@ export default {
     notFound: "找不到帖子",
     backToNews: "返回新闻",
   },
+  viewMode: {
+    post: "帖子视图",
+    article: "文章视图",
+  },
   newsDetail: {
     back: "返回",
     reactions: "互动",

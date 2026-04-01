@@ -6,6 +6,8 @@ import StoryInputBar from "./StoryInputBar"
 import DanmakuStage from "./DanmakuStage"
 import PassConfirmationModal from "./PassConfirmationModal"
 import MyStoryModal from "./MyStoryModal"
+import { LoadingSpinner } from "@/shared/components/ui/indicators"
+
 
 const LiveMessages = ({ languageCommunity }) => {
   const {
@@ -16,6 +18,8 @@ const LiveMessages = ({ languageCommunity }) => {
     handleCreate,
     handleInteract,
     handleDelete,
+    loadingStories,
+    loadingMyStories,
   } = useStories(languageCommunity)
   const { t } = useLanguage()
   const [selectedStory, setSelectedStory] = useState(null)
@@ -36,24 +40,8 @@ const LiveMessages = ({ languageCommunity }) => {
   const totalCount = stories.length + myStories.length
   const handleSend = () => handleCreate(inputValue)
 
-  // Empty state
-  if (!combinedStories || combinedStories.length === 0) {
-    return (
-      <div className="relative my-6 w-full max-w-full overflow-hidden rounded-3xl bg-white/60 px-2 py-8 text-center">
-        <StoryInputBar
-          inputValue={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onSend={handleSend}
-          myCount={myCount}
-          totalCount={totalCount}
-          variant="empty"
-        />
-        <div className="mt-4 text-[#7A7574] italic">
-          {t.catSpeak.mail.noStories}
-        </div>
-      </div>
-    )
-  }
+  const isLoading = loadingStories || loadingMyStories
+  const isEmpty = !isLoading && combinedStories.length === 0
 
   // Interaction handlers
   const handleItemClick = (story) => {
@@ -83,13 +71,26 @@ const LiveMessages = ({ languageCommunity }) => {
         onSend={handleSend}
         myCount={myCount}
         totalCount={totalCount}
+        variant={isEmpty ? "empty" : "default"}
       />
 
-      <DanmakuStage
-        danmakuItems={danmakuItems}
-        stageRef={stageRef}
-        onItemClick={handleItemClick}
-      />
+      {isLoading ? (
+        <div className="flex-1 flex items-center justify-center min-h-0">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : isEmpty ? (
+        <div className="relative my-6 flex-1 w-full max-w-full overflow-hidden rounded-3xl bg-white/60 px-2 py-8 text-center">
+          <div className="mt-4 text-[#7A7574] italic">
+            {t.catSpeak.mail.noStories}
+          </div>
+        </div>
+      ) : (
+        <DanmakuStage
+          danmakuItems={danmakuItems}
+          stageRef={stageRef}
+          onItemClick={handleItemClick}
+        />
+      )}
 
       <PassConfirmationModal
         open={!!selectedStory}

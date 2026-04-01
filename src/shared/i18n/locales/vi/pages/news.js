@@ -5,6 +5,10 @@ export default {
     notFound: "Không tìm thấy bài viết",
     backToNews: "Quay lại tin tức",
   },
+  viewMode: {
+    post: "Dạng bài đăng",
+    article: "Dạng bài viết",
+  },
   newsDetail: {
     back: "Trở lại",
     reactions: "lượt tương tác",

@@ -1,8 +1,6 @@
 import React from "react"
 import { useParams } from "react-router-dom"
 import { LiveMessages } from "@/features/stories"
-import { MailDashboard } from "@/features/calendar"
-
 // Normalize URL lang codes to canonical backend values
 const LANG_TO_COMMUNITY = {
   vi: "Vietnamese",
@@ -27,13 +25,8 @@ const MailPage = () => {
   return (
     <div className="w-full">
       <LiveMessages languageCommunity={languageCommunity} />
-
-      {/* <div className="mt-8 mb-12 px-2 md:px-0">
-        <MailDashboard />
-      </div> */}
     </div>
   )
 }
 
 export default MailPage
-

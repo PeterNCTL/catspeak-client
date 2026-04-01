@@ -53,7 +53,7 @@ const NewsDetailPage = () => {
     : undefined
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl px-4 py-6">
       {/* Back Button */}
       <BackButton to={`/${lang}/cat-speak/news`}>
         {t.news?.newsDetail?.back}
