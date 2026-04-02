@@ -245,6 +245,7 @@ export const VideoCallProvider = ({ children }) => {
       connect={true}
       audio={initMicOn}
       video={initCamOn}
+      className="h-full w-full flex flex-col"
       options={{
         publishDefaults: {
           simulcast: true,

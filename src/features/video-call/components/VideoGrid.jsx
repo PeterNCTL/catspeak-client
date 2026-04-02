@@ -85,7 +85,7 @@ const VideoGrid = ({
       {participants.map((participant) => (
         <div
           key={participant.identity}
-          className="relative w-full max-w-full max-[425px]:min-h-[300px] max-[425px]:flex-1 max-[425px]:shrink-0"
+          className="relative h-full w-full max-w-full max-[425px]:min-h-[300px] max-[425px]:flex-1 max-[425px]:shrink-0"
         >
           <VideoTile participant={participant} />
         </div>
