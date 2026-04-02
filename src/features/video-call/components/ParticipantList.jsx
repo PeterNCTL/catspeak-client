@@ -1,27 +1,23 @@
 import { Mic, MicOff, Video, VideoOff } from "lucide-react"
-import { useParticipant, useMeeting } from "@videosdk.live/react-sdk"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import Avatar from "@/shared/components/ui/Avatar"
 
 /**
  * A single row in the participant list.
- * All reactive state (mic/cam) comes from useParticipant() for remote participants,
- * or from the localMicOn/localCameraOn props for the local user.
+ * Uses LiveKit Participant object properties directly.
  */
 const ParticipantItem = ({
-  participantId,
-  isLocal,
+  participant,
   localMicOn,
   localCameraOn,
 }) => {
   const { t } = useLanguage()
   const pl = t.rooms.videoCall.participantList
-  const { displayName, micOn, webcamOn } = useParticipant(participantId)
 
-  const isMicOn = isLocal ? localMicOn : (micOn ?? false)
-  const isCameraOn = isLocal ? localCameraOn : (webcamOn ?? false)
-  const name = displayName || (isLocal ? pl.you : pl.guest)
-  const initial = name.charAt(0).toUpperCase()
+  const isLocal = participant.isLocal
+  const isMicOn = isLocal ? localMicOn : (participant.isMicrophoneEnabled ?? false)
+  const isCameraOn = isLocal ? localCameraOn : (participant.isCameraEnabled ?? false)
+  const name = participant.name || participant.identity || (isLocal ? pl.you : pl.guest)
 
   return (
     <div className="flex items-center justify-between pl-1.5 pr-2 py-1 rounded">
@@ -45,38 +41,34 @@ const ParticipantItem = ({
  * Participant list panel.
  *
  * Props:
- *  participantIds  – ordered array of VideoSDK participant IDs (local first)
- *  currentUserId   – the logged-in user's accountId (to identify the local tile)
+ *  participants    – ordered array of LiveKit Participant objects (local first)
  *  localMicOn      – reactive local mic state from useVideoCall()
  *  localCameraOn   – reactive local cam state from useVideoCall()
  */
 const ParticipantList = ({
-  participantIds,
+  participants,
   localMicOn,
   localCameraOn,
   hideTitle,
 }) => {
   const { t } = useLanguage()
   const pl = t.rooms.videoCall.participantList
-  const { localParticipant } = useMeeting()
-  const localSdkId = localParticipant?.id
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
       {!hideTitle && (
         <div className="px-4 py-3 border-b border-[#C6C6C6]">
           <h3 className="text-black text-sm font-semibold m-0">
-            {pl.title} ({participantIds.length})
+            {pl.title} ({participants.length})
           </h3>
         </div>
       )}
       <div className="flex-1 overflow-y-auto p-2">
         <ul className="flex flex-col">
-          {participantIds.map((pid) => (
-            <li key={pid}>
+          {participants.map((participant) => (
+            <li key={participant.identity}>
               <ParticipantItem
-                participantId={pid}
-                isLocal={pid === localSdkId}
+                participant={participant}
                 localMicOn={localMicOn}
                 localCameraOn={localCameraOn}
               />

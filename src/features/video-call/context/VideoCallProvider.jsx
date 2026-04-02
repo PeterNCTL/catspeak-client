@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import { useParams } from "react-router-dom"
-import { MeetingProvider } from "@videosdk.live/react-sdk"
+import { toast } from "react-hot-toast"
+import { LiveKitRoom } from "@livekit/components-react"
 import { useGetProfileQuery } from "@/features/auth"
 import {
   useGetVideoSessionByIdQuery,
-  useGetVideoSdkTokenMutation,
+  useGetLivekitTokenMutation,
 } from "@/store/api/videoSessionsApi"
 import {
   useGetRoomByIdQuery,
@@ -12,7 +13,6 @@ import {
   useMediaPreview,
   useJoinVideoSession,
 } from "@/features/rooms"
-import { meetingConfig } from "@/shared/utils/videoSdkConfig"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { VideoCallContent } from "./VideoCallContext"
 import VideoCallLoading from "../components/VideoCallLoading"
@@ -20,11 +20,13 @@ import RoomNotFoundScreen from "../components/RoomNotFoundScreen"
 import SessionErrorScreen from "../components/SessionErrorScreen"
 import LoadingSpinner from "@/shared/components/ui/indicators/LoadingSpinner"
 
+const LIVEKIT_WS_URL = "wss://livekit.catspeak.com.vn"
+
 /**
  * Phases:
  *  - "waiting"  : Room loaded, showing WaitingScreen with media preview
  *  - "joining"  : User clicked "Join Now", creating/joining video session
- *  - "in-call"  : Session joined, SDK token acquired, MeetingProvider rendered
+ *  - "in-call"  : Session joined, LiveKit token acquired, LiveKitRoom rendered
  */
 export const VideoCallProvider = ({ children }) => {
   const { id: roomId } = useParams()
@@ -33,10 +35,9 @@ export const VideoCallProvider = ({ children }) => {
   // Phase state machine
   const [phase, setPhase] = useState("waiting") // "waiting" | "joining" | "in-call"
   const [joinedSessionId, setJoinedSessionId] = useState(null)
-  const [sdkToken, setSdkToken] = useState(null)
+  const [livekitToken, setLivekitToken] = useState(null)
   const [initMicOn, setInitMicOn] = useState(false)
   const [initCamOn, setInitCamOn] = useState(false)
-  const hasInitRef = useRef(false)
 
   // --- User data ---
   const { data: userData, isLoading: isLoadingUser } = useGetProfileQuery()
@@ -97,34 +98,8 @@ export const VideoCallProvider = ({ children }) => {
     skip: !joinedSessionId,
   })
 
-  // --- SDK token (fetched after session data is available) ---
-  const [getVideoSdkToken] = useGetVideoSdkTokenMutation()
-
-  useEffect(() => {
-    if (phase !== "in-call" || !session || !user || hasInitRef.current) return
-
-    const initMeeting = async () => {
-      try {
-        hasInitRef.current = true
-        const res = await getVideoSdkToken({
-          meetingId: session.videoSdkMeetingId,
-          name: user.username,
-        }).unwrap()
-
-        const token = res?.token
-        if (typeof token !== "string" || token.trim().split(".").length !== 3) {
-          throw new Error("Invalid VideoSDK token received from backend")
-        }
-
-        setSdkToken(token)
-      } catch (err) {
-        console.error("[VideoCall] Meeting init failed:", err)
-        hasInitRef.current = false
-      }
-    }
-
-    initMeeting()
-  }, [phase, session, user, getVideoSdkToken])
+  // --- LiveKit token mutation ---
+  const [getLivekitToken] = useGetLivekitTokenMutation()
 
   // --- Cleanup media preview tracks when transitioning to in-call ---
   const cleanupMediaPreview = useCallback(() => {
@@ -134,21 +109,46 @@ export const VideoCallProvider = ({ children }) => {
   }, [localStream])
 
   // --- Handle "Join Now" click ---
+  // Flow: LiveKit token first → backend session only if token is valid
   const handleJoinClick = async () => {
     setPhase("joining")
 
-    const result = await hookJoin({ isRoomFull, micOn, cameraOn })
+    try {
+      // 1. Fetch LiveKit token FIRST to validate connectivity
+      const tokenRes = await getLivekitToken({
+        roomId: parseInt(roomId),
+        roomName: room.name,
+        participantIdentity: String(user.accountId),
+        participantName: user.username,
+      }).unwrap()
 
-    if (result) {
-      // Stop preview tracks before entering the call
-      cleanupMediaPreview()
+      const token = tokenRes?.token
+      if (!token || typeof token !== "string") {
+        throw new Error("Invalid LiveKit token received from backend")
+      }
 
-      setInitMicOn(result.micOn)
-      setInitCamOn(result.cameraOn)
-      setJoinedSessionId(result.sessionId)
-      setPhase("in-call")
-    } else {
-      // Join failed, go back to waiting
+      // 2. Token is valid → now create/join the backend session
+      const result = await hookJoin({ isRoomFull, micOn, cameraOn })
+
+      if (result) {
+        // Stop preview tracks before entering the call
+        cleanupMediaPreview()
+
+        setLivekitToken(token)
+        setInitMicOn(result.micOn)
+        setInitCamOn(result.cameraOn)
+        setJoinedSessionId(result.sessionId)
+        setPhase("in-call")
+      } else {
+        // Backend session join failed, go back to waiting
+        setPhase("waiting")
+      }
+    } catch (err) {
+      console.error("[VideoCall] LiveKit token fetch failed:", err)
+      toast.error(
+        t.rooms.videoCall.provider.tokenError ??
+          "Failed to connect to video service. Please try again.",
+      )
       setPhase("waiting")
     }
   }
@@ -157,8 +157,13 @@ export const VideoCallProvider = ({ children }) => {
   //  RENDER: Guards & phase-based rendering
   // ========================================
 
-  // Loading room data (also wait while user profile is loading or room query hasn't run yet)
-  if (isLoadingUser || isLoadingRoom || isLoadingSessions || isRoomQuerySkipped) {
+  // Loading room data
+  if (
+    isLoadingUser ||
+    isLoadingRoom ||
+    isLoadingSessions ||
+    isRoomQuerySkipped
+  ) {
     return (
       <div className="flex h-screen items-center justify-center bg-white text-gray-500">
         <LoadingSpinner text={t.rooms.waitingScreen.loading} />
@@ -166,7 +171,7 @@ export const VideoCallProvider = ({ children }) => {
     )
   }
 
-  // Room not found (only after the room query has actually executed)
+  // Room not found
   if (roomError || !room) {
     return <RoomNotFoundScreen />
   }
@@ -224,8 +229,8 @@ export const VideoCallProvider = ({ children }) => {
     return <SessionErrorScreen error={sessionError} />
   }
 
-  // Wait for SDK token
-  if (!sdkToken || !userData) {
+  // Wait for LiveKit token
+  if (!livekitToken || !userData) {
     return (
       <VideoCallLoading
         message={t.rooms.videoCall.provider.connecting ?? "Connecting..."}
@@ -234,30 +239,26 @@ export const VideoCallProvider = ({ children }) => {
   }
 
   return (
-    <MeetingProvider
-      config={{
-        ...meetingConfig,
-        meetingId: session.videoSdkMeetingId,
-        micEnabled: initMicOn,
-        webcamEnabled: initCamOn,
-        name: user?.username || "Guest",
-        metaData: {
-          accountId: user?.accountId,
-          username: user?.username,
+    <LiveKitRoom
+      serverUrl={LIVEKIT_WS_URL}
+      token={livekitToken}
+      connect={true}
+      audio={initMicOn}
+      video={initCamOn}
+      options={{
+        publishDefaults: {
+          simulcast: true,
         },
       }}
-      token={sdkToken}
-      joinWithoutUserInteraction={false}
     >
       <VideoCallContent
         user={user}
         session={session}
         sessionError={sessionError}
-        sdkToken={sdkToken}
         room={room}
       >
         {children}
       </VideoCallContent>
-    </MeetingProvider>
+    </LiveKitRoom>
   )
 }

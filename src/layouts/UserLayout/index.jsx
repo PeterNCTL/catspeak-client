@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Layout, theme } from "antd"
 import { Outlet, ScrollRestoration } from "react-router-dom"
-import HeaderBar from "../MainLayout/HeaderBar"
-import Footer from "../MainLayout/Footer"
+import HeaderBar from "../../shared/components/Header/HeaderBar"
+import Footer from "../../shared/components/Footer"
 import Auth from "@/features/auth/components"
 import AuthModalContext from "@/shared/context/AuthModalContext"
 
@@ -34,7 +34,13 @@ const UserLayout = ({ showFooter = true }) => {
   } = theme.useToken()
 
   return (
-    <AuthModalContext.Provider value={{ openAuthModal, closeAuthModal, redirectAfterLogin: authModal.redirectAfterLogin }}>
+    <AuthModalContext.Provider
+      value={{
+        openAuthModal,
+        closeAuthModal,
+        redirectAfterLogin: authModal.redirectAfterLogin,
+      }}
+    >
       <Layout className="flex justify-center bg-white">
         {/* Header full width */}
         <HeaderBar onGetStarted={() => openAuthModal("login")} />

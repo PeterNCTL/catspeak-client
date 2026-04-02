@@ -1,5 +1,5 @@
 import React from "react"
-import { useLanguage } from "../../../shared/context/LanguageContext"
+import { useLanguage } from "../../context/LanguageContext"
 import PillButton from "@/shared/components/ui/buttons/PillButton"
 
 const HeaderGuestControls = ({ onGetStarted }) => {

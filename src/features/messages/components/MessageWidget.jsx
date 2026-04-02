@@ -230,7 +230,7 @@ const MessageWidget = () => {
         className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-[#F2F2F2] hover:bg-[#D9D9D9] ${isOpen ? "" : ""}`}
         aria-label="Tin nhắn"
       >
-        <MessageCircle size={20} />
+        <MessageCircle />
       </button>
     </div>
   )

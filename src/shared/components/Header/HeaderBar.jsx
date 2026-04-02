@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import { Menu } from "lucide-react"
-import HeaderLogo from "./Header/HeaderLogo"
+import HeaderLogo from "./HeaderLogo"
 import DesktopNav from "@/features/navigation/components/DesktopNav/DesktopNav"
 import MobileDrawer from "@/features/navigation/components/MobileNav/MobileDrawer"
-import HeaderUserControls from "./Header/HeaderUserControls"
-import HeaderGuestControls from "./Header/HeaderGuestControls"
+import HeaderUserControls from "./HeaderUserControls"
+import HeaderGuestControls from "./HeaderGuestControls"
 import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher"
 import { useAuth } from "@/features/auth"
 

@@ -13,8 +13,9 @@ const BasicInfoSection = ({
 }) => {
   return (
     <div className="flex flex-col gap-6 pt-4">
+      {/* Full Name / Username */}
       <EditableField
-        label={t.profile?.personalInfo?.username}
+        label={t.profile?.personalInfo?.username || "Họ và tên"}
         value={formData.username}
         name="username"
         isEditing={editingField === "username"}
@@ -23,40 +24,43 @@ const BasicInfoSection = ({
         onCancel={onCancel}
         onSave={onSave}
         onChange={onChange}
-        editLabel={t.profile?.personalInfo?.edit}
+        editLabel={t.profile?.personalInfo?.edit || "Edit"}
       />
 
-      {/* Email (Read only) */}
+      {/* Nickname */}
+      <EditableField
+        label={t.profile?.personalInfo?.nickname || "Nickname"}
+        value={formData.nickname}
+        name="nickname"
+        isEditing={editingField === "nickname"}
+        isUpdating={isUpdating}
+        onEdit={onEdit}
+        onCancel={onCancel}
+        onSave={onSave}
+        onChange={onChange}
+        editLabel={t.profile?.personalInfo?.edit || "Edit"}
+      />
+
+      {/* Country */}
       <div className="flex items-center justify-between border-b border-gray-100 py-3">
         <span className="w-32 font-bold text-gray-900">
-          {t.profile?.personalInfo?.email}
+          {t.profile?.personalInfo?.country || "Quốc gia"}
         </span>
-        <span className="flex-1 text-gray-600">{formData.email}</span>
-        <button className="font-bold text-gray-400 cursor-not-allowed">
-          {t.profile?.personalInfo?.edit}
-        </button>
+        <div className="flex-1"></div>
+        <div className="relative">
+          <button className="flex items-center gap-2 rounded border border-gray-200 px-3 py-1 text-sm font-bold text-red-900 hover:bg-gray-50">
+            {formData.country || "Viet Nam"}
+            <span className="text-gray-400">▼</span>
+          </button>
+        </div>
       </div>
 
       {/* Account Type */}
       <div className="flex items-center justify-between border-b border-gray-100 py-3">
         <span className="w-32 font-bold text-gray-900">
-          {t.profile?.personalInfo?.accountType}
+          {t.profile?.personalInfo?.accountType || "Account type"}
         </span>
         <span className="flex-1 text-gray-600">{formData.accountType}</span>
-      </div>
-
-      {/* Level */}
-      <div className="flex items-center justify-between border-b border-gray-100 py-3">
-        <span className="w-32 font-bold text-gray-900">
-          {t.profile?.personalInfo?.level}
-        </span>
-        <div className="flex-1"></div>
-        <div className="relative">
-          <button className="flex items-center gap-2 rounded border border-gray-200 px-3 py-1 text-sm font-bold text-red-900 hover:bg-gray-50">
-            {formData.level}
-            <span className="text-gray-400">▼</span>
-          </button>
-        </div>
       </div>
     </div>
   )

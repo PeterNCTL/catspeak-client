@@ -7,7 +7,14 @@ import React, {
   useCallback,
 } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
-import { useMeeting, usePubSub } from "@videosdk.live/react-sdk"
+import {
+  useRoomContext,
+  useParticipants,
+  useLocalParticipant,
+  useChat,
+  useConnectionState,
+} from "@livekit/components-react"
+import { ConnectionState } from "livekit-client"
 import { useVideoCall } from "@/features/video-call/hooks/useVideoCall"
 import { useScreenShare } from "@/features/video-call/hooks/useScreenShare"
 import toast from "react-hot-toast"
@@ -27,7 +34,7 @@ export const useVideoCallContext = () => {
 }
 
 /**
- * Renders inside MeetingProvider. Owns all call-level state and actions,
+ * Renders inside LiveKitRoom. Owns all call-level state and actions,
  * then provides them via context.
  */
 export const VideoCallContent = ({
@@ -35,12 +42,9 @@ export const VideoCallContent = ({
   user,
   session,
   sessionError,
-  sdkToken,
   room,
 }) => {
   const { lang } = useParams()
-  // session.sessionId is the actual session identifier for API calls.
-  // The URL :id is now roomId, not sessionId.
   const sessionId = session?.sessionId
   const navigate = useNavigate()
   const location = useLocation()
@@ -52,15 +56,13 @@ export const VideoCallContent = ({
 
   const [leaveSession] = useLeaveVideoSessionMutation()
 
-  // Track whether we've already left the session (to avoid double-calls)
+  // Track whether we've already left the session
   const hasLeftRef = useRef(false)
 
   const leaveSessionOnUnload = useCallback(() => {
     if (!sessionId || hasLeftRef.current) return
     hasLeftRef.current = true
 
-    // Use fetch with keepalive for reliable delivery during page unload
-    // (sendBeacon only supports POST, but the leave API requires DELETE)
     const baseUrl = import.meta.env.VITE_API_BASE_URL || "/api"
     const url = `${baseUrl}/video-sessions/${sessionId}/participants`
     const token = localStorage.getItem("token")
@@ -75,7 +77,7 @@ export const VideoCallContent = ({
     }).catch(() => {})
   }, [sessionId])
 
-  // Register beforeunload / pagehide to leave session when tab/window closes
+  // Register beforeunload / pagehide to leave session
   useEffect(() => {
     const handleBeforeUnload = () => {
       leaveSessionOnUnload()
@@ -90,25 +92,33 @@ export const VideoCallContent = ({
     }
   }, [leaveSessionOnUnload])
 
-  // SDK — participant list & connected state
-  const { participants, localParticipant } = useMeeting()
+  // LiveKit room instance
+  const lkRoom = useRoomContext()
 
-  // Local mic/cam state + lifecycle (join/leave) + toggle actions
+  // LiveKit — all participants (local + remote)
+  const allParticipants = useParticipants()
+  const { localParticipant } = useLocalParticipant()
+
+  // Connection state
+  const connectionState = useConnectionState()
+  const isConnected = connectionState === ConnectionState.Connected
+
+  // Local mic/cam state + toggle actions
   const { micOn, cameraOn, toggleAudio, toggleVideo, leaveMeeting, isJoined } =
-    useVideoCall(sdkToken, t)
+    useVideoCall(t)
 
   // Screen share state & actions
   const {
     screenShareOn,
-    screenShareStream,
+    screenShareTrackRef,
     presenterId: screenSharePresenterId,
     isLocalScreenShare,
     toggleScreenShare,
     presenterDisplayName,
   } = useScreenShare()
 
-  // Chat via VideoSDK PubSub
-  const { publish, messages } = usePubSub("CHAT", {})
+  // Chat via LiveKit data channels
+  const { chatMessages, send: chatSend } = useChat()
 
   const handleToggleMic = async () => {
     try {
@@ -137,10 +147,10 @@ export const VideoCallContent = ({
     }
   }
 
-  const handleSendMessage = (text) => publish(text, { persist: true })
+  const handleSendMessage = (text) => chatSend(text)
 
   const handleLeaveSession = async () => {
-    hasLeftRef.current = true // prevent unload handler from double-firing
+    hasLeftRef.current = true
     if (sessionId) {
       try {
         await leaveSession(sessionId).unwrap()
@@ -157,33 +167,21 @@ export const VideoCallContent = ({
     toast.success("Link copied to clipboard!")
   }
 
-  // Build a stable participant id list for VideoGrid.
-  // Deduplication: if the same accountId joins on two tabs only show them once.
-  const seenAccountIds = new Set()
-  const participantIds = []
+  // Build deduplicated participant list (local first)
+  const seenIdentities = new Set()
+  const participants = []
 
   if (localParticipant) {
-    const aid = localParticipant.metaData?.accountId
-    if (aid) seenAccountIds.add(String(aid))
-    participantIds.push(localParticipant.id)
+    seenIdentities.add(localParticipant.identity)
+    participants.push(localParticipant)
   }
 
-  ;[...participants.values()].forEach((p) => {
-    if (p.id === localParticipant?.id) return
-    const aid = p.metaData?.accountId
-    const key = aid ? String(aid) : `__sdk__${p.id}`
-    if (seenAccountIds.has(key)) {
-      console.warn(
-        `[VideoCallContext] 🔄 Dedup: dropping participant ${p.id} ` +
-          `(accountId=${aid}, displayName=${p.displayName}) — already seen`,
-      )
-      return
-    }
-    seenAccountIds.add(key)
-    participantIds.push(p.id)
+  allParticipants.forEach((p) => {
+    if (p.identity === localParticipant?.identity) return
+    if (seenIdentities.has(p.identity)) return
+    seenIdentities.add(p.identity)
+    participants.push(p)
   })
-
-  const isConnected = isJoined
 
   if (!isConnected) {
     return (
@@ -205,12 +203,12 @@ export const VideoCallContent = ({
     setShowParticipants,
     user,
     currentUserId: user?.accountId,
-    localParticipantId: localParticipant?.id,
+    localParticipant,
     session,
     room,
     sessionError,
-    participantIds,
-    messages,
+    participants,
+    messages: chatMessages,
     isConnected,
     handleToggleMic,
     handleToggleCam,
@@ -219,7 +217,7 @@ export const VideoCallContent = ({
     handleCopyLink,
     // Screen share
     screenShareOn,
-    screenShareStream,
+    screenShareTrackRef,
     screenSharePresenterId,
     isLocalScreenShare,
     presenterDisplayName,

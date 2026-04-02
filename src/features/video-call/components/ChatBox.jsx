@@ -8,7 +8,6 @@ import TextInput from "@/shared/components/ui/inputs/TextInput"
 const ChatBox = ({
   messages,
   currentUser,
-  localParticipantId,
   onSendMessage,
   isConnected,
   className = "",
@@ -71,24 +70,12 @@ const ChatBox = ({
           </p>
         ) : (
           messages.map((msg, index) => {
-            if (msg.type === "system") {
-              return (
-                <span
-                  key={msg.id || `system-${index}`}
-                  className="block text-xs text-center text-[#7A7574] italic my-2"
-                >
-                  {msg.message}
-                </span>
-              )
-            }
-
-            const isMe =
-              String(msg.senderId) === String(currentUser?.accountId) ||
-              String(msg.senderId) === String(currentUser?.id) ||
-              String(msg.senderId) === String(localParticipantId)
+            // LiveKit useChat message format:
+            // { id, timestamp, message, from?: Participant }
+            const isMe = msg.from?.isLocal ?? false
             const senderName = isMe
               ? t.rooms.chatBox.you
-              : msg.senderName || `User ${msg.senderId}`
+              : msg.from?.name || msg.from?.identity || `User`
 
             return (
               <div

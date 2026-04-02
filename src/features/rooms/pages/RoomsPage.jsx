@@ -133,7 +133,7 @@ const RoomsPage = () => {
         className="w-full"
       >
         {/* Hero Section - Improved mobile spacing */}
-        <div className="grid grid-cols-1 gap-5 p-5 sm:px-6 sm:py-8 md:gap-10 md:py-12 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 p-5 md:gap-10 lg:grid-cols-2">
           {/* Left column - Welcome Section */}
           <div className="flex flex-col gap-8">
             <WelcomeSection />
@@ -156,7 +156,7 @@ const RoomsPage = () => {
         </div>
 
         {/* Lower section with content & sidebar */}
-        <div className="px-5 sm:px-6 sm:pb-12">
+        <div className="px-5">
           <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[320px_1fr]">
             {/* Sidebar - Hidden on mobile by default, shown on tablet+ */}
             <div className="hidden lg:block">

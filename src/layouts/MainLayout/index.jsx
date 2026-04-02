@@ -6,8 +6,8 @@ import {
   useSearchParams,
   ScrollRestoration,
 } from "react-router-dom"
-import HeaderBar from "./HeaderBar"
-import Footer from "./Footer"
+import HeaderBar from "../../shared/components/Header/HeaderBar"
+import Footer from "../../shared/components/Footer"
 import Auth from "@/features/auth/components"
 import AuthModalContext from "@/shared/context/AuthModalContext"
 import { AnimatePresence } from "framer-motion"

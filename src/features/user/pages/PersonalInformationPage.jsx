@@ -4,26 +4,31 @@ import { useLanguage } from "@/shared/context/LanguageContext"
 import {
   useGetUserProfileQuery,
   useUpdateUserProfileMutation,
-} from "@/features/user/api/userApi"
+} from "@/store/api/userApi"
 
-import ProfileHeader from "../components/PersonalInformation/ProfileHeader"
-import BasicInfoSection from "../components/PersonalInformation/BasicInfoSection"
-import AccountPrivacySection from "../components/PersonalInformation/AccountPrivacySection"
+import ProfileHeader from "../components/ProfileHeader"
+import BasicInfoSection from "../components/BasicInfoSection"
+import AccountPrivacySection from "../components/AccountPrivacySection"
 
 const PersonalInformationPage = () => {
   const { user } = useAuth()
   const { t } = useLanguage()
-  const { data: profileData, isLoading } = useGetUserProfileQuery()
+  const { data: profileData, isLoading, error } = useGetUserProfileQuery()
+  
+  console.log("Profile Query State:", { profileData, isLoading, error })
 
   const [updateProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation()
 
   const [formData, setFormData] = useState({
     username: "",
+    nickname: "",
     email: "",
     accountType: "Student",
     level: "HSK3",
     address: "",
+    phoneNumber: "",
+    country: "",
     avatarImageUrl: "",
   })
 
@@ -33,10 +38,13 @@ const PersonalInformationPage = () => {
     if (profileData?.data) {
       setFormData({
         username: profileData.data.username || "",
+        nickname: profileData.data.nickname || "",
         email: profileData.data.email || "",
         accountType: profileData.data.roleName || "Student",
         level: profileData.data.level || "HSK3",
         address: profileData.data.address || "",
+        phoneNumber: profileData.data.phoneNumber || "",
+        country: profileData.data.country || "",
         avatarImageUrl: profileData.data.avatarImageUrl || "",
       })
     }
@@ -52,7 +60,11 @@ const PersonalInformationPage = () => {
       setFormData((prev) => ({
         ...prev,
         username: profileData.data.username || "",
+        nickname: profileData.data.nickname || "",
+        email: profileData.data.email || "",
         address: profileData.data.address || "",
+        phoneNumber: profileData.data.phoneNumber || "",
+        country: profileData.data.country || "",
       }))
     }
   }
@@ -60,13 +72,11 @@ const PersonalInformationPage = () => {
   const handleSave = async () => {
     try {
       await updateProfile({
-        username: formData.username,
-        avatarImageUrl: formData.avatarImageUrl,
+        nickname: formData.nickname,
+        country: formData.country,
         address: formData.address,
-        dateOfBirth: profileData?.data?.dateOfBirth, // Preserve existing
-        level: formData.level,
-        preferredLanguage: profileData?.data?.preferredLanguage, // Preserve existing
-        country: profileData?.data?.country, // Preserve existing
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
       }).unwrap()
       setEditingField(null)
     } catch (error) {
@@ -82,7 +92,7 @@ const PersonalInformationPage = () => {
   if (isLoading) return <div>Loading...</div>
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5">
       <h1 className="text-xl font-bold text-red-900">
         {t.profile?.personalInfo?.title}
       </h1>

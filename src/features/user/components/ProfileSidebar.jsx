@@ -34,22 +34,26 @@ const ProfileSidebar = () => {
   ]
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col space-y-1">
       {menuItems.map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
           end={item.end}
           className={({ isActive }) =>
-            `flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
+            `flex w-full h-10 items-center gap-3 px-4 text-left text-sm transition-colors rounded-[5px] ${
               isActive
-                ? "bg-gray-100 text-red-900 hover:text-red-900"
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                ? "bg-[#F2F2F2] text-[#990011] hover:bg-[#E6E6E6] hover:text-[#990011]"
+                : "text-gray-700 hover:bg-[#F2F2F2] hover:text-gray-900"
             }`
           }
         >
-          <item.icon size={20} />
-          {item.label}
+          {({ isActive }) => (
+            <>
+              <item.icon className={isActive ? "text-[#990011]" : ""} />
+              <span>{item.label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </div>

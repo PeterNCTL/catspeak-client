@@ -1,4 +1,5 @@
-import { useMeeting } from "@videosdk.live/react-sdk"
+import { useTracks } from "@livekit/components-react"
+import { Track } from "livekit-client"
 import VideoTile from "./VideoTile"
 import ScreenShareTile from "./ScreenShareTile"
 
@@ -7,27 +8,20 @@ import ScreenShareTile from "./ScreenShareTile"
  * When a screen is being shared, switches to a spotlight layout:
  *   - Screen share tile takes the main area
  *   - Webcam tiles go into a scrollable sidebar/strip
+ *
+ * Uses LiveKit useTracks for reactive camera track references.
+ * Participants are passed as props from context.
  */
 const VideoGrid = ({
-  participantIds: propIds,
+  participants: propParticipants,
   screenShareOn,
-  screenShareStream,
+  screenShareTrackRef,
   screenSharePresenterId,
   presenterDisplayName,
   isLocalScreenShare,
 }) => {
-  const { participants, localParticipant } = useMeeting()
-
-  // Build ordered ID list: local first, then remotes.
-  const ids =
-    propIds ??
-    (() => {
-      const list = localParticipant ? [localParticipant.id] : []
-      ;[...participants.values()].forEach((p) => {
-        if (p.id !== localParticipant?.id) list.push(p.id)
-      })
-      return list
-    })()
+  // Use provided participants list (already deduplicated, local-first from context)
+  const participants = propParticipants ?? []
 
   const gridClass = "min-[426px]:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]"
 
@@ -35,13 +29,13 @@ const VideoGrid = ({
     "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#990011] [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar]:w-1.5"
 
   // ─── Spotlight layout when someone is sharing their screen ───
-  if (screenShareOn && screenSharePresenterId && screenShareStream) {
+  if (screenShareOn && screenSharePresenterId && screenShareTrackRef) {
     return (
       <div className="flex h-full w-full flex-col gap-2 p-2 sm:p-3 md:flex-row md:gap-3 md:p-4 overflow-hidden">
         {/* Main: screen share tile */}
         <div className="flex-1 min-h-0 min-w-0">
           <ScreenShareTile
-            screenShareStream={screenShareStream}
+            trackRef={screenShareTrackRef}
             presenterDisplayName={presenterDisplayName ?? "Unknown"}
             isLocal={isLocalScreenShare}
           />
@@ -56,9 +50,9 @@ const VideoGrid = ({
             ${scrollbarClasses}
           `}
         >
-          {ids.map((participantId) => (
+          {participants.map((participant) => (
             <div
-              key={participantId}
+              key={participant.identity}
               className="
                 shrink-0
                 md:w-full md:h-36
@@ -66,7 +60,7 @@ const VideoGrid = ({
                 rounded-lg overflow-hidden
               "
             >
-              <VideoTile participantId={participantId} />
+              <VideoTile participant={participant} />
             </div>
           ))}
         </div>
@@ -88,12 +82,12 @@ const VideoGrid = ({
     ${scrollbarClasses}
   `}
     >
-      {ids.map((participantId) => (
+      {participants.map((participant) => (
         <div
-          key={participantId}
+          key={participant.identity}
           className="relative w-full max-w-full max-[425px]:min-h-[300px] max-[425px]:flex-1 max-[425px]:shrink-0"
         >
-          <VideoTile participantId={participantId} />
+          <VideoTile participant={participant} />
         </div>
       ))}
     </div>

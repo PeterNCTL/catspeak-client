@@ -2,35 +2,27 @@ import { useEffect, useRef, useCallback } from "react"
 import { MonitorUp } from "lucide-react"
 
 /**
- * Renders a shared screen in a <video> element.
+ * Renders a shared screen using LiveKit track.attach().
  * Uses object-contain to preserve the screen's native aspect ratio.
  *
- * @param {{ screenShareStream: MediaStream | null, presenterDisplayName: string, isLocal: boolean }} props
+ * @param {{ trackRef: import('@livekit/components-react').TrackReferenceOrPlaceholder, presenterDisplayName: string, isLocal: boolean }} props
  */
-const ScreenShareTile = ({ screenShareStream, presenterDisplayName, isLocal }) => {
+const ScreenShareTile = ({ trackRef, presenterDisplayName, isLocal }) => {
   const videoRef = useRef(null)
 
-  const attemptPlay = useCallback(async (el) => {
-    if (!el || !el.paused) return
-    try {
-      await el.play()
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        console.warn("[ScreenShareTile] play() failed:", err.name, err.message)
-      }
-    }
-  }, [])
-
+  // Attach/detach the screen share track
   useEffect(() => {
     const el = videoRef.current
-    if (!el) return
+    const track = trackRef?.publication?.track
 
-    el.srcObject = screenShareStream ?? null
+    if (!el || !track) return
 
-    if (screenShareStream) {
-      attemptPlay(el)
+    track.attach(el)
+
+    return () => {
+      track.detach(el)
     }
-  }, [screenShareStream, attemptPlay])
+  }, [trackRef?.publication?.track])
 
   const label = isLocal
     ? `${presenterDisplayName}'s screen (You)`

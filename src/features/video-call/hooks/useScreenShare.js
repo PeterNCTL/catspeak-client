@@ -1,53 +1,42 @@
-import { useMemo } from "react"
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk"
+import { useCallback } from "react"
+import {
+  useRoomContext,
+  useLocalParticipant,
+  useTracks,
+} from "@livekit/components-react"
+import { Track } from "livekit-client"
 
 /**
- * Encapsulates screen-share state & actions using VideoSDK's built-in APIs.
+ * Encapsulates screen-share state & actions using LiveKit.
  *
- * - `toggleScreenShare` / `presenterId` come from useMeeting()
- * - `screenShareStream` / `screenShareOn` come from useParticipant(presenterId)
- *
- * @returns {{
- *   screenShareOn: boolean,
- *   screenShareStream: MediaStream | null,
- *   presenterId: string | null,
- *   isLocalScreenShare: boolean,
- *   toggleScreenShare: () => void,
- *   presenterDisplayName: string | null,
- * }}
+ * - Detects active screen shares via useTracks(ScreenShare)
+ * - Toggle via room.localParticipant.setScreenShareEnabled()
  */
 export const useScreenShare = () => {
-  const {
-    toggleScreenShare,
-    presenterId,
-    localParticipant,
-  } = useMeeting()
+  const room = useRoomContext()
+  const { isScreenShareEnabled } = useLocalParticipant()
 
-  // When someone is presenting, pull their screen-share data via useParticipant.
-  // If nobody is presenting we pass "" — the hook returns safe defaults.
-  const {
-    screenShareStream,
-    screenShareOn,
-    displayName: presenterDisplayName,
-  } = useParticipant(presenterId ?? "")
+  // Get all screen share tracks across all participants
+  const screenShareTracks = useTracks([Track.Source.ScreenShare])
 
-  const isLocalScreenShare = Boolean(
-    presenterId && localParticipant && presenterId === localParticipant.id,
-  )
+  // Find the first active screen share
+  const screenShareTrackRef =
+    screenShareTracks.length > 0 ? screenShareTracks[0] : null
 
-  // Build a stable MediaStream from the screen-share track.
-  const screenShareMediaStream = useMemo(() => {
-    const track = screenShareStream?.track
-    if (!track || !screenShareOn) return null
-    return new MediaStream([track])
-  }, [screenShareStream?.track, screenShareOn])
+  const presenter = screenShareTrackRef?.participant ?? null
+  const isLocalScreenShare = presenter?.isLocal ?? false
+  const screenShareOn = !!screenShareTrackRef
+
+  const toggleScreenShare = useCallback(async () => {
+    await room.localParticipant.setScreenShareEnabled(!isScreenShareEnabled)
+  }, [room, isScreenShareEnabled])
 
   return {
-    screenShareOn: screenShareOn ?? false,
-    screenShareStream: screenShareMediaStream,
-    presenterId: presenterId ?? null,
+    screenShareOn,
+    screenShareTrackRef,
+    presenterId: presenter?.identity ?? null,
     isLocalScreenShare,
     toggleScreenShare,
-    presenterDisplayName: presenterDisplayName ?? null,
+    presenterDisplayName: presenter?.name ?? null,
   }
 }

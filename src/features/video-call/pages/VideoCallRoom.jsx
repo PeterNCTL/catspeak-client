@@ -1,7 +1,7 @@
 import React from "react"
 import { Navigate } from "react-router-dom"
 import { ChevronRight } from "lucide-react"
-import HeaderLogo from "@/layouts/MainLayout/Header/HeaderLogo"
+import HeaderLogo from "@/shared/components/Header/HeaderLogo"
 
 import {
   VideoGrid,
@@ -29,9 +29,9 @@ const VideoCallRoomContent = () => {
     setShowParticipants,
     user,
     currentUserId,
-    localParticipantId,
+    localParticipant,
     session,
-    participantIds,
+    participants,
     messages,
     isConnected,
     handleToggleMic,
@@ -40,7 +40,7 @@ const VideoCallRoomContent = () => {
     handleLeaveSession,
     // Screen share
     screenShareOn,
-    screenShareStream,
+    screenShareTrackRef,
     screenSharePresenterId,
     isLocalScreenShare,
     presenterDisplayName,
@@ -70,14 +70,14 @@ const VideoCallRoomContent = () => {
       if (!showChat) {
         let newUnread = 0
         for (let i = prevMessagesLength.current; i < messages.length; i++) {
-          if (String(messages[i].senderId) !== String(currentUserId))
-            newUnread++
+          // LiveKit chat: msg.from?.isLocal identifies own messages
+          if (!messages[i].from?.isLocal) newUnread++
         }
         setUnreadMessages((prev) => prev + newUnread)
       }
     }
     prevMessagesLength.current = messages.length
-  }, [messages, showChat, currentUserId])
+  }, [messages, showChat])
 
   React.useEffect(() => {
     if (showChat) setUnreadMessages(0)
@@ -136,9 +136,9 @@ const VideoCallRoomContent = () => {
         <div className="relative flex flex-1 flex-col min-h-0 overflow-hidden bg-gradient-to-br from-primary2 via-white to-primary2">
           <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-[0.03] pointer-events-none" />
           <VideoGrid
-            participantIds={participantIds}
+            participants={participants}
             screenShareOn={screenShareOn}
-            screenShareStream={screenShareStream}
+            screenShareTrackRef={screenShareTrackRef}
             screenSharePresenterId={screenSharePresenterId}
             presenterDisplayName={presenterDisplayName}
             isLocalScreenShare={isLocalScreenShare}
@@ -150,8 +150,7 @@ const VideoCallRoomContent = () => {
           <div className="hidden w-80 flex-col border-l border-[#C6C6C6] bg-white md:flex">
             {showParticipants && (
               <ParticipantList
-                participantIds={participantIds}
-                currentUserId={currentUserId}
+                participants={participants}
                 localMicOn={micOn}
                 localCameraOn={cameraOn}
               />
@@ -160,7 +159,6 @@ const VideoCallRoomContent = () => {
               <ChatBox
                 messages={messages}
                 currentUser={user}
-                localParticipantId={localParticipantId}
                 onSendMessage={handleSendMessage}
                 isConnected={isConnected}
                 className="h-full w-full"
@@ -202,8 +200,7 @@ const VideoCallRoomContent = () => {
                 <div className="flex-1 overflow-y-auto">
                   {showParticipants && (
                     <ParticipantList
-                      participantIds={participantIds}
-                      currentUserId={currentUserId}
+                      participants={participants}
                       localMicOn={micOn}
                       localCameraOn={cameraOn}
                       hideTitle
@@ -213,7 +210,6 @@ const VideoCallRoomContent = () => {
                     <ChatBox
                       messages={messages}
                       currentUser={user}
-                      localParticipantId={localParticipantId}
                       onSendMessage={handleSendMessage}
                       isConnected={isConnected}
                       className="h-full w-full"

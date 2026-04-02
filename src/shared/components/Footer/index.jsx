@@ -8,10 +8,10 @@ import Facebook from "@mui/icons-material/Facebook"
 import YouTube from "@mui/icons-material/YouTube"
 import { SiZalo } from "react-icons/si"
 
-import CommunitySection from "./components/CommunitySection"
+import CommunitySection from "./CommunitySection"
 
-import ContactSection from "./components/ContactSection"
-import FooterBottom from "./components/FooterBottom"
+import ContactSection from "./ContactSection"
+import FooterBottom from "./FooterBottom"
 
 const Footer = () => {
   const { t } = useLanguage()
