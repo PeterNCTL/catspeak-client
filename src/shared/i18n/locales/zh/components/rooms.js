@@ -68,7 +68,7 @@ export default {
     },
     seeMore: "查看更多",
     noRoomsFound: "未找到这些类别的房间",
-    noRoomsFoundCategory: "在此类别中未找到房间",
+    noRoomsFoundCategory: "这里好像还有点安静！去其他类别探索一下吧。",
   },
   tabs: {
     communicate: "交流",

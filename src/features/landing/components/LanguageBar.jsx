@@ -29,7 +29,7 @@ const LanguageBar = () => {
   }
 
   return (
-    <div className="relative z-10 mt-4 px-4 sm:mt-6 sm:px-6 md:absolute md:top-auto md:-bottom-14 md:mt-0 md:left-0 md:px-8">
+    <div className="relative z-10 mt-4 px-4 sm:mt-6 sm:px-6 md:absolute md:top-auto md:-bottom-14 md:mt-0 md:left-0 md:px-10">
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3 md:max-w-4xl">
         {languages.map((lang, idx) => {
           if (lang.code === "vi") return null

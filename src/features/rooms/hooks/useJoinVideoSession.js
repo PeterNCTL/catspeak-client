@@ -32,9 +32,9 @@ export const useJoinVideoSession = ({ roomId, isAuthenticated = true }) => {
    * Returns the sessionId on success, or null on failure.
    * Does NOT navigate — the caller manages state transitions.
    */
-  const handleJoin = async ({ isRoomFull, micOn, cameraOn }) => {
+  const handleJoin = async ({ isRoomFull, micOn, cameraOn, skipRoomFullCheck = false }) => {
     try {
-      if (isRoomFull) {
+      if (isRoomFull && !skipRoomFullCheck) {
         toast.error(t.rooms.waitingScreen.roomFull)
         return null
       }

@@ -69,7 +69,7 @@ export default {
     },
     seeMore: "See more",
     noRoomsFound: "No rooms found for these categories",
-    noRoomsFoundCategory: "No rooms found in this category",
+    noRoomsFoundCategory: "No rooms here yet! Feel free to explore other categories.",
   },
   tabs: {
     communicate: "Communicate",

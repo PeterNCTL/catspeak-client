@@ -1,5 +1,4 @@
 // Components
-export { default as RoomFilterSidebar } from "./components/navigation/RoomFilterSidebar"
 export { default as RoomCard } from "./components/RoomCard"
 export { default as CreateRoomModal } from "./components/CreateRoomModal"
 export { default as CategoryRoomSection } from "./components/sections/CategoryRoomSection"
@@ -8,7 +7,6 @@ export { default as EmptyRoomState } from "./components/EmptyRoomState"
 export { default as RoomsTabs } from "./components/navigation/RoomsTabs"
 export { default as RoomsMobileDrawer } from "./components/navigation/RoomsMobileDrawer"
 export { default as SessionActionButtons } from "./components/SessionActionButtons"
-export { default as WelcomeSection } from "./components/sections/WelcomeSection"
 export { default as AllowConnectSwitch } from "./components/AllowConnectSwitch"
 export {
   WaitingScreen,

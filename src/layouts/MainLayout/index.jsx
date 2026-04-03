@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { Layout, theme } from "antd"
 import {
   Outlet,
   useLocation,
@@ -12,8 +11,7 @@ import Auth from "@/features/auth/components"
 import AuthModalContext from "@/shared/context/AuthModalContext"
 import { AnimatePresence } from "framer-motion"
 import { FluentAnimation } from "@/shared/components/ui/animations"
-
-const { Content } = Layout
+import MainSidebar from "./MainSidebar"
 
 const MainLayout = ({ showHeader = true, showFooter = true }) => {
   const [authModal, setAuthModal] = useState({
@@ -24,6 +22,7 @@ const MainLayout = ({ showHeader = true, showFooter = true }) => {
 
   const location = useLocation()
   const [searchParams] = useSearchParams()
+  const isLandingPage = location.pathname === "/"
 
   // Check for reset password intent
   useEffect(() => {
@@ -60,10 +59,6 @@ const MainLayout = ({ showHeader = true, showFooter = true }) => {
       redirectAfterLogin: null,
     }))
 
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken()
-
   return (
     <AuthModalContext.Provider
       value={{
@@ -72,28 +67,35 @@ const MainLayout = ({ showHeader = true, showFooter = true }) => {
         redirectAfterLogin: authModal.redirectAfterLogin,
       }}
     >
-      <Layout className="flex justify-center bg-white">
-        {/* Header full width */}
+      <div className="flex flex-col min-h-screen bg-white text-left">
         {showHeader && (
-          <HeaderBar onGetStarted={() => openAuthModal("login")} />
+          <HeaderBar 
+            onGetStarted={() => openAuthModal("login")} 
+            hideDesktopNav={!isLandingPage} 
+          />
         )}
 
-        <Content className="w-full flex justify-center">
-          <Outlet />
-        </Content>
+        <div className="flex flex-row flex-1 bg-white min-w-0 items-stretch">
+          {!isLandingPage && <MainSidebar />}
+
+          <main className="flex-1 flex flex-col min-w-0">
+            <Outlet />
+          </main>
+        </div>
 
         {/* Footer full width (bên trong tự giới hạn 1200px) */}
-        {showFooter && <Footer />}
+        {showFooter && isLandingPage && <Footer />}
 
-        <Auth
-          isOpen={authModal.isOpen}
-          mode={authModal.mode}
-          onClose={closeAuthModal}
-          onSwitchMode={openAuthModal}
-        />
+      </div>
 
-        <ScrollRestoration />
-      </Layout>
+      <Auth
+        isOpen={authModal.isOpen}
+        mode={authModal.mode}
+        onClose={closeAuthModal}
+        onSwitchMode={openAuthModal}
+      />
+
+      <ScrollRestoration />
     </AuthModalContext.Provider>
   )
 }

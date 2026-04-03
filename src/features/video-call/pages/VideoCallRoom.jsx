@@ -20,33 +20,21 @@ import { getTranslatedRoomName } from "@/features/rooms/utils/roomNameUtils"
 const VideoCallRoomContent = () => {
   const { t } = useLanguage()
   const {
-    location,
-    micOn,
-    cameraOn,
+    // Layout state
     showChat,
     setShowChat,
     showParticipants,
     setShowParticipants,
+    // Auth guard
     user,
-    currentUserId,
-    localParticipant,
+    location,
+    // Header info
     session,
-    participants,
-    messages,
-    isConnected,
-    handleToggleMic,
-    handleToggleCam,
-    handleSendMessage,
-    handleLeaveSession,
-    // Screen share
-    screenShareOn,
-    screenShareTrackRef,
-    screenSharePresenterId,
-    isLocalScreenShare,
-    presenterDisplayName,
-    handleToggleScreenShare,
-    // Room data
     room,
+    // ChatBox props (presentational component — keeps props-based API)
+    messages,
+    handleSendMessage,
+    isConnected,
   } = useVideoCallContext()
 
   const { formattedElapsed, formattedMax } = useSessionTimer(session)
@@ -135,26 +123,13 @@ const VideoCallRoomContent = () => {
         {/* Video Area */}
         <div className="relative flex flex-1 flex-col min-h-0 overflow-hidden bg-gradient-to-br from-primary2 via-white to-primary2">
           <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-[0.03] pointer-events-none" />
-          <VideoGrid
-            participants={participants}
-            screenShareOn={screenShareOn}
-            screenShareTrackRef={screenShareTrackRef}
-            screenSharePresenterId={screenSharePresenterId}
-            presenterDisplayName={presenterDisplayName}
-            isLocalScreenShare={isLocalScreenShare}
-          />
+          <VideoGrid />
         </div>
 
         {/* Desktop Side Panel */}
         {isSidePanelOpen && (
           <div className="hidden w-80 flex-col border-l border-[#C6C6C6] bg-white md:flex">
-            {showParticipants && (
-              <ParticipantList
-                participants={participants}
-                localMicOn={micOn}
-                localCameraOn={cameraOn}
-              />
-            )}
+            {showParticipants && <ParticipantList />}
             {showChat && !showParticipants && (
               <ChatBox
                 messages={messages}
@@ -198,14 +173,7 @@ const VideoCallRoomContent = () => {
                 </button>
 
                 <div className="flex-1 overflow-y-auto">
-                  {showParticipants && (
-                    <ParticipantList
-                      participants={participants}
-                      localMicOn={micOn}
-                      localCameraOn={cameraOn}
-                      hideTitle
-                    />
-                  )}
+                  {showParticipants && <ParticipantList hideTitle />}
                   {showChat && !showParticipants && (
                     <ChatBox
                       messages={messages}
@@ -223,20 +191,7 @@ const VideoCallRoomContent = () => {
         )}
       </div>
 
-      <VideoCallControlBar
-        micOn={micOn}
-        cameraOn={cameraOn}
-        screenShareOn={screenShareOn}
-        showChat={showChat}
-        setShowChat={setShowChat}
-        showParticipants={showParticipants}
-        setShowParticipants={setShowParticipants}
-        unreadMessages={unreadMessages}
-        handleToggleMic={handleToggleMic}
-        handleToggleCam={handleToggleCam}
-        handleToggleScreenShare={handleToggleScreenShare}
-        handleLeaveSession={handleLeaveSession}
-      />
+      <VideoCallControlBar unreadMessages={unreadMessages} />
     </div>
   )
 }

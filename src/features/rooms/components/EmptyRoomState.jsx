@@ -1,11 +1,19 @@
 import React from "react"
+import LogoIcon from "@/shared/assets/icons/logo/icon.svg"
 
-const EmptyRoomState = ({ message, height = "h-48" }) => {
+const EmptyRoomState = ({ message, height = "h-[320px]" }) => {
   return (
     <div
-      className={`flex ${height} w-full flex-col items-center justify-center rounded-xl bg-white border border-[#C6C6C6]`}
+      className={`flex ${height} w-full flex-col items-center justify-center rounded-xl bg-gray-50 border border-[#E5E5E5] transition-all hover:bg-gray-100/80`}
     >
-      <p className="px-4 m-0 text-sm text-[#7A7574]">{message}</p>
+      <img 
+        src={LogoIcon} 
+        alt="Empty State" 
+        className="h-16 w-16 rounded-full bg-white shadow-sm mb-4 border border-[#E5E5E5] p-3 object-contain" 
+      />
+      <p className="px-8 m-0 text-center text-sm font-medium text-[#7A7574] leading-relaxed max-w-sm">
+        {message}
+      </p>
     </div>
   )
 }

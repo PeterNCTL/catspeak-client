@@ -1,132 +1,116 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState } from "react"
 import { useParams } from "react-router-dom"
-import {
-  BubbleChevronLeft,
-  BubbleChevronRight,
-} from "@/shared/components/ui/buttons/index"
 import { useLanguage } from "@/shared/context/LanguageContext"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { AnimatePresence } from "framer-motion"
+import FluentAnimation from "@/shared/components/ui/animations/FluentAnimation"
 import InDevelopmentModal from "@/shared/components/ui/InDevelopmentModal"
 import ChinaWorkshopModal from "./modals/ChinaWorkshopModal"
 import { getWorkshopSlides } from "../data/workshopSlides"
-import PillButton from "@/shared/components/ui/buttons/PillButton"
+import WorkshopCard from "./WorkshopCard"
+import useRoomCarousel from "@/features/rooms/hooks/useRoomCarousel"
+import useResponsiveItemsPerPage from "@/features/rooms/hooks/useResponsiveItemsPerPage"
+import colors from "@/shared/utils/colors"
 
 const WorkshopCarousel = ({ slides: propSlides = [] }) => {
   const { lang } = useParams()
   const { t } = useLanguage()
   const [modalType, setModalType] = useState(null) // 'china' or 'development'
-  const [activeIndex, setActiveIndex] = useState(0)
 
   // Get slides from data utility
   const slides = getWorkshopSlides(t, lang, propSlides)
 
-  const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length)
-  }, [slides.length])
+  const itemsPerPage = useResponsiveItemsPerPage()
+  const isMobile = itemsPerPage === null
 
-  const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev + 1) % slides.length)
-  }, [slides.length])
-
-  // Autoplay
-  useEffect(() => {
-    if (!slides || slides.length <= 1) return
-    const interval = setInterval(() => {
-      handleNext()
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [handleNext, slides.length])
+  const { visibleItems, currentPage, goNext, goPrev, canGoNext, canGoPrev } =
+    useRoomCarousel(slides, itemsPerPage ?? 4)
 
   if (slides.length === 0) return null
 
-  return (
-    <>
-      <div className="mx-auto max-w-3xl w-full">
-        <div className="relative overflow-hidden rounded-xl bg-black/5 shadow-[0_20px_50px_rgba(0,0,0,0.2)] group aspect-video w-full">
-          {/* Carousel Slides */}
-          {slides.map((slide, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
-                idx === activeIndex
-                  ? "opacity-100 z-10 pointer-events-auto"
-                  : "opacity-0 z-0 pointer-events-none"
-              }`}
+  const renderHeader = (showNavButtons = false) => {
+    const shouldShowNav = showNavButtons && slides.length > itemsPerPage
+
+    return (
+      <div className="relative z-10 flex w-full items-center justify-between mb-2">
+        <h2
+          className="text-xl font-bold"
+          style={{ color: colors?.headingColor || "#111827" }}
+        >
+          {t?.workshops?.title || "Workshops"}
+        </h2>
+
+        {shouldShowNav && (
+          <div className="flex items-center gap-2 pr-2">
+            <button
+              onClick={goPrev}
+              disabled={!canGoPrev}
+              aria-label="Previous workshops"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-[#C6C6C6] transition-all duration-200 hover:bg-gray-50 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
             >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="h-full w-full object-cover transform transition-transform duration-[2000ms] ease-out"
-              />
-              {/* Vertical gradient overlay (darker at bottom) */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={goNext}
+              disabled={!canGoNext}
+              aria-label="Next workshops"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-[#C6C6C6] transition-all duration-200 hover:bg-gray-50 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
 
-              {/* Horizontal subtle gradient (only on md+) */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent hidden md:block" />
+  const renderMobileContent = () => (
+    <div className="flex flex-col gap-2">
+      {renderHeader()}
+      <div className="flex gap-4 overflow-x-auto py-8 -my-8 px-2 -mx-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {slides.map((slide, idx) => (
+          <div key={idx} className="min-w-full flex-shrink-0 snap-center flex">
+            <WorkshopCard slide={slide} onCtaClick={setModalType} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
-              <div className="absolute inset-0 flex flex-col justify-center sm:justify-end p-6 sm:p-10 md:p-16 text-white text-left">
-                <div className="max-w-xl space-y-3 sm:space-y-5 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold drop-shadow-lg line-clamp-1">
-                      {slide.title || t.workshops.heroCarousel.comingSoonTitle}
-                    </h2>
-                    {slide.subtext && (
-                      <p className="text-sm leading-relaxed line-clamp-2">
-                        {slide.subtext}
-                      </p>
-                    )}
-                  </div>
+  const renderDesktopContent = () => {
+    const gridCols = itemsPerPage === 2 ? "grid-cols-2" : "grid-cols-3"
 
-                  <div className="pt-1.5">
-                    <PillButton
-                      onClick={() => setModalType(slide.modal || "development")}
-                      bgColor="#f5c518"
-                      textColor="#990011"
-                      className="h-10"
-                    >
-                      {slide.cta}
-                    </PillButton>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+    return (
+      <div className="flex flex-col gap-2">
+        {renderHeader(true)}
 
-          {/* Custom Navigation Buttons & Dots */}
-          {slides.length > 1 && (
-            <>
-              {/* Nav Buttons - Shown on hover (desktop) */}
-              <div className="hidden sm:block absolute left-6 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110">
-                <BubbleChevronLeft
-                  aria-label="Prev slide"
-                  onClick={handlePrev}
+        <div className="overflow-hidden py-10 -my-10 px-4 -mx-4">
+          <AnimatePresence mode="wait">
+            <FluentAnimation
+              key={currentPage}
+              animationKey={currentPage}
+              direction="none"
+              duration={0.15}
+              exit={true}
+              className={`grid ${gridCols} gap-4 w-full`}
+            >
+              {visibleItems.map((slide, idx) => (
+                <WorkshopCard
+                  key={`${currentPage}-${idx}`}
+                  slide={slide}
+                  onCtaClick={setModalType}
                 />
-              </div>
-              <div className="hidden sm:block absolute right-6 top-1/2 -translate-y-1/2 z-20 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110">
-                <BubbleChevronRight
-                  aria-label="Next slide"
-                  onClick={handleNext}
-                />
-              </div>
-
-              {/* Pagination Dots */}
-              <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-3">
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveIndex(idx)}
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                      idx === activeIndex
-                        ? "w-8 bg-[#f5c518] shadow-[0_0_10px_rgba(245,197,24,0.5)]"
-                        : "w-2 bg-white/40 hover:bg-white/60"
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+              ))}
+            </FluentAnimation>
+          </AnimatePresence>
         </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="w-full">
+      {isMobile ? renderMobileContent() : renderDesktopContent()}
 
       <ChinaWorkshopModal
         open={modalType === "china"}
@@ -138,7 +122,7 @@ const WorkshopCarousel = ({ slides: propSlides = [] }) => {
         open={modalType === "development"}
         onCancel={() => setModalType(null)}
       />
-    </>
+    </div>
   )
 }
 

@@ -1,8 +1,6 @@
 import React from "react"
 import { useLanguage } from "@/shared/context/LanguageContext"
 
-import { CatSpeakSidebar } from "@/features/cat-speak"
-
 const CatSpeakPage = () => {
   const { t } = useLanguage()
 
@@ -10,7 +8,7 @@ const CatSpeakPage = () => {
     <div className="min-h-screen w-full">
       <div className="mx-auto grid max-w-screen-xl gap-8 px-4 lg:grid-cols-[240px_1fr_350px] lg:px-8">
         {/* LEFT COLUMN: SIDEBAR */}
-        <CatSpeakSidebar />
+        <div></div>
 
         {/* MIDDLE COLUMN: PUBLIC FEED */}
         <div className="flex flex-col gap-10">

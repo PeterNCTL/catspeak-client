@@ -97,7 +97,7 @@ const DesktopCommunityDropdown = ({ navKey }) => {
         {/* Community navigation */}
         <div
           onClick={handleCommunityClick}
-          className="h-12 flex items-center pl-6 pr-3 rounded-l-full cursor-pointer hover:bg-white/10 transition-colors"
+          className="h-10 flex items-center pl-6 pr-3 rounded-l-full cursor-pointer hover:bg-white/10 transition-colors"
         >
           {selectedLabel || t.nav?.[navKey]}
         </div>
@@ -109,7 +109,7 @@ const DesktopCommunityDropdown = ({ navKey }) => {
               e.stopPropagation()
               setIsOpen((prev) => !prev)
             }}
-            className="h-12 w-12 flex items-center justify-center rounded-r-full hover:bg-white/10 transition-colors cursor-pointer"
+            className="h-10 w-10 flex items-center justify-center rounded-r-full hover:bg-white/10 transition-colors cursor-pointer"
           >
             <ChevronDown
               className={`transition-transform duration-200 ${

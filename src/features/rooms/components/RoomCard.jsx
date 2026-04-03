@@ -1,5 +1,6 @@
 import React from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
+import { motion } from "framer-motion"
 import { Clock, Users, Link, Bookmark } from "lucide-react"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useAuth } from "@/features/auth"
@@ -12,7 +13,6 @@ import {
 import InDevelopmentModal from "@/shared/components/ui/InDevelopmentModal"
 import Modal from "@/shared/components/ui/Modal"
 import RoomFullModal from "./RoomFullModal"
-import Animated3DCard from "@/shared/components/ui/animations/Animated3DCard"
 
 import { getTranslatedRoomName } from "../utils/roomNameUtils"
 
@@ -79,10 +79,15 @@ const RoomCard = ({ room }) => {
 
   return (
     <>
-      <Animated3DCard
+      <motion.div
         onClick={handleRoomClick}
-        style={{ fontFamily: "'Inter', sans-serif" }}
-        className="relative flex w-full flex-col overflow-hidden rounded-xl bg-white border border-[#C6C6C6]"
+        style={{
+          fontFamily: "'Inter', sans-serif",
+          WebkitFontSmoothing: "antialiased",
+        }}
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        className="relative flex h-[320px] w-full flex-col overflow-hidden rounded-xl bg-white border border-[#E5E5E5] cursor-pointer"
       >
         {/* Cover Image Section */}
         <div className="relative h-48 w-full overflow-hidden">
@@ -141,7 +146,7 @@ const RoomCard = ({ room }) => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
             {/* Participants */}
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-gray-200">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-[#E5E5E5]">
                 <Users size={16} className="text-[#990011]" />
               </div>
               <span className="text-sm whitespace-nowrap">
@@ -153,7 +158,7 @@ const RoomCard = ({ room }) => {
 
             {/* Date/Time */}
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-gray-200">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-[#E5E5E5]">
                 <Clock size={16} className="text-[#990011]" />
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -163,7 +168,7 @@ const RoomCard = ({ room }) => {
             </div>
           </div>
         </div>
-      </Animated3DCard>
+      </motion.div>
 
       <InDevelopmentModal
         open={showDevModal}

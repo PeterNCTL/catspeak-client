@@ -47,7 +47,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="flex flex-col max-w-screen-xl">
+    <div className="flex flex-col w-full max-w-screen-xl mx-auto">
       <div className="relative w-full pt-4 mb-24">
         {/* Main Hero Section */}
         <HeroSection openAuthModal={openAuthModal} />

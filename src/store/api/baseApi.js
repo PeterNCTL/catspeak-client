@@ -83,7 +83,8 @@ async function ensureRefresh(api, extraOptions, reason) {
 
       if (refreshResult.error) {
         const status = refreshResult.error.status
-        console.error(AUTH_LOG, `Refresh failed with status ${status} — logging out`, { reason })
+        const details = refreshResult.error.data
+        console.error(AUTH_LOG, `Refresh failed with status ${status} — logging out`, { reason, details, fullError: refreshResult.error })
         api.dispatch(logout())
         return false
       }
@@ -131,7 +132,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     const currentToken = api.getState().auth.token
     if (currentToken) {
       const remaining = tokenSecondsRemaining(currentToken)
-      if (remaining > 0 && remaining < PROACTIVE_REFRESH_BUFFER) {
+      if (remaining < PROACTIVE_REFRESH_BUFFER) {
         console.info(
           AUTH_LOG,
           `Token expires in ${Math.round(remaining)}s — proactively refreshing before ${url}`,

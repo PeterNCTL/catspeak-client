@@ -58,6 +58,7 @@ export const VideoCallContent = ({
 
   // Track whether we've already left the session
   const hasLeftRef = useRef(false)
+  const isLeavingRef = useRef(false)
 
   const leaveSessionOnUnload = useCallback(() => {
     if (!sessionId || hasLeftRef.current) return
@@ -151,6 +152,7 @@ export const VideoCallContent = ({
 
   const handleLeaveSession = async () => {
     hasLeftRef.current = true
+    isLeavingRef.current = true
     if (sessionId) {
       try {
         await leaveSession(sessionId).unwrap()
@@ -184,6 +186,8 @@ export const VideoCallContent = ({
   })
 
   if (!isConnected) {
+    // Don't show "Connecting..." when intentionally leaving
+    if (isLeavingRef.current) return null
     return (
       <VideoCallLoading
         message={t.rooms.videoCall.provider.connecting ?? "Connecting..."}

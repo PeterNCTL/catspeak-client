@@ -1,48 +1,76 @@
-import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useUrlFilter } from "../../hooks/useUrlFilter"
 import { TOPICS } from "../../config/constants"
-
-import Collapsible from "@/shared/components/ui/Collapsible"
+import { ChevronDown } from "lucide-react"
 
 const TopicFilter = () => {
   const { t } = useLanguage()
   const { toggleValue, isSelected } = useUrlFilter("topics")
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  const selectedCount = TOPICS.filter(topic => isSelected(topic)).length
 
   return (
-    <div className="w-full">
-      <Collapsible 
-        title={t.rooms.filters.topicsHeading}
-        maxHeight="200px"
-        scrollable
+    <div className="relative inline-block text-left" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 rounded-lg h-10 px-4 text-sm font-medium transition-all duration-200 border ${isOpen || selectedCount > 0 ? "border-[#990011] bg-white text-[#990011]" : "border-[#C6C6C6] bg-white hover:bg-gray-50"}`}
       >
-        <div className="flex flex-col">
-          {TOPICS.map((topic) => {
-            const isChecked = isSelected(topic)
+        <span>{t.rooms?.filters?.topicsHeading || "Topics"}</span>
+        {selectedCount > 0 && (
+          <span className="flex items-center justify-center bg-[#990011] text-white text-xs rounded-full min-w-[20px] h-5 px-1">
+            {selectedCount}
+          </span>
+        )}
+        <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
 
-            return (
-              <label
-                key={topic}
-                className={`h-10 flex items-center gap-3 cursor-pointer rounded-md px-4 transition-colors ${
-                  isChecked
-                    ? "bg-[#F2F2F2] hover:bg-[#E5E5E5]"
-                    : "hover:bg-[#F2F2F2]"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={(e) => toggleValue(topic, e.target.checked)}
-                  className="w-4 h-4 text-[#990011] bg-white accent-[#990011] cursor-pointer"
-                />
-                <span className="text-sm">
-                  {t.rooms.createRoom?.topics?.[topic.toLowerCase()] || topic}
-                </span>
-              </label>
-            )
-          })}
+      {isOpen && (
+        <div className="absolute left-0 z-[100] mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="p-2 max-h-60 overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#990011] [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar]:w-1.5 flex flex-col">
+            {TOPICS.map((topic) => {
+              const isChecked = isSelected(topic)
+
+              return (
+                <label
+                  key={topic}
+                  className={`flex items-center gap-3 cursor-pointer rounded-md p-2 transition-colors ${
+                    isChecked
+                      ? "bg-[#F2F2F2] hover:bg-[#E5E5E5]"
+                      : "hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(e) => toggleValue(topic, e.target.checked)}
+                    className="w-4 h-4 text-[#990011] bg-white accent-[#990011] cursor-pointer"
+                  />
+                  <span className="text-sm">
+                    {t.rooms?.createRoom?.topics?.[topic.toLowerCase()] || topic}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
         </div>
-      </Collapsible>
+      )}
     </div>
   )
 }

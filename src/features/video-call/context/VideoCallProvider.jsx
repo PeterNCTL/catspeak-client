@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from "react"
-import { useParams } from "react-router-dom"
+import React, { useState, useCallback, useEffect, useRef } from "react"
+import { useParams, useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-hot-toast"
 import { LiveKitRoom } from "@livekit/components-react"
 import { useGetProfileQuery } from "@/features/auth"
@@ -30,10 +30,15 @@ const LIVEKIT_WS_URL = "wss://livekit.catspeak.com.vn"
  */
 export const VideoCallProvider = ({ children }) => {
   const { id: roomId } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const { t } = useLanguage()
 
-  // Phase state machine
-  const [phase, setPhase] = useState("waiting") // "waiting" | "joining" | "in-call"
+  // Detect if user arrived from queue match
+  const fromQueue = location.state?.fromQueue === true
+
+  // Phase state machine — skip waiting if from queue
+  const [phase, setPhase] = useState(fromQueue ? "joining" : "waiting") // "waiting" | "joining" | "in-call"
   const [joinedSessionId, setJoinedSessionId] = useState(null)
   const [livekitToken, setLivekitToken] = useState(null)
   const [initMicOn, setInitMicOn] = useState(false)
@@ -110,7 +115,7 @@ export const VideoCallProvider = ({ children }) => {
 
   // --- Handle "Join Now" click ---
   // Flow: LiveKit token first → backend session only if token is valid
-  const handleJoinClick = async () => {
+  const handleJoinClick = async ({ skipRoomFullCheck = false } = {}) => {
     setPhase("joining")
 
     try {
@@ -128,7 +133,7 @@ export const VideoCallProvider = ({ children }) => {
       }
 
       // 2. Token is valid → now create/join the backend session
-      const result = await hookJoin({ isRoomFull, micOn, cameraOn })
+      const result = await hookJoin({ isRoomFull, micOn, cameraOn, skipRoomFullCheck })
 
       if (result) {
         // Stop preview tracks before entering the call
@@ -152,6 +157,25 @@ export const VideoCallProvider = ({ children }) => {
       setPhase("waiting")
     }
   }
+
+  // --- Auto-join for queue-matched users (skip WaitingScreen) ---
+  const autoJoinTriggered = useRef(false)
+  useEffect(() => {
+    if (
+      fromQueue &&
+      !autoJoinTriggered.current &&
+      user &&
+      room &&
+      !isLoadingUser &&
+      !isLoadingRoom
+    ) {
+      autoJoinTriggered.current = true
+      // Clear fromQueue state to prevent re-trigger on page refresh
+      navigate(location.pathname, { replace: true, state: {} })
+      // Auto-join with mic/camera OFF, bypassing room-full check
+      handleJoinClick({ skipRoomFullCheck: true })
+    }
+  }, [fromQueue, user, room, isLoadingUser, isLoadingRoom])
 
   // ========================================
   //  RENDER: Guards & phase-based rendering

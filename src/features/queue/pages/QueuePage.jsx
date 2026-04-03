@@ -22,12 +22,12 @@ const QueuePage = () => {
     () => ({
       MatchFound: (data) => {
         setQueueState({ type: "MATCHED" })
-        if (data.sessionId) {
+        if (data.roomId) {
           // Play notification sound?
           setTimeout(() => {
             const communityLang =
               localStorage.getItem("communityLanguage") || "en"
-            navigate(`/${communityLang}/meet/${data.sessionId}`)
+            navigate(`/${communityLang}/meet/${data.roomId}`, { state: { fromQueue: true } })
           }, 1000)
         }
       },

@@ -10,22 +10,22 @@ import {
   MicOff,
   Phone,
 } from "lucide-react"
+import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
 
-const VideoCallControlBar = ({
-  micOn,
-  cameraOn,
-  screenShareOn,
-  showChat,
-  setShowChat,
-  showParticipants,
-  setShowParticipants,
-  unreadMessages,
-  isLeaving,
-  handleToggleMic,
-  handleToggleCam,
-  handleToggleScreenShare,
-  handleLeaveSession,
-}) => {
+const VideoCallControlBar = ({ unreadMessages }) => {
+  const {
+    micOn,
+    cameraOn,
+    screenShareOn,
+    showChat,
+    setShowChat,
+    showParticipants,
+    setShowParticipants,
+    handleToggleMic,
+    handleToggleCam,
+    handleToggleScreenShare,
+    handleLeaveSession,
+  } = useVideoCallContext()
   // Common button styles
   const buttonBaseClass =
     "flex items-center justify-center rounded-full transition-colors shadow-sm w-12 h-12"
@@ -108,9 +108,8 @@ const VideoCallControlBar = ({
 
       <button
         onClick={handleLeaveSession}
-        disabled={isLeaving}
         title="Leave call"
-        className={`${buttonBaseClass} bg-[#d40018] text-white hover:bg-[#e7001a] disabled:opacity-50`}
+        className={`${buttonBaseClass} bg-[#d40018] text-white hover:bg-[#e7001a]`}
       >
         <Phone className="rotate-[135deg]" />
       </button>

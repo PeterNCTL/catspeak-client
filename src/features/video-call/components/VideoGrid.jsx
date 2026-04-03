@@ -2,6 +2,7 @@ import { useTracks } from "@livekit/components-react"
 import { Track } from "livekit-client"
 import VideoTile from "./VideoTile"
 import ScreenShareTile from "./ScreenShareTile"
+import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
 
 /**
  * Renders a responsive grid of VideoTile components.
@@ -10,18 +11,20 @@ import ScreenShareTile from "./ScreenShareTile"
  *   - Webcam tiles go into a scrollable sidebar/strip
  *
  * Uses LiveKit useTracks for reactive camera track references.
- * Participants are passed as props from context.
+ * Participants are passed from context.
  */
-const VideoGrid = ({
-  participants: propParticipants,
-  screenShareOn,
-  screenShareTrackRef,
-  screenSharePresenterId,
-  presenterDisplayName,
-  isLocalScreenShare,
-}) => {
+const VideoGrid = () => {
+  const {
+    participants: contextParticipants,
+    screenShareOn,
+    screenShareTrackRef,
+    screenSharePresenterId,
+    presenterDisplayName,
+    isLocalScreenShare,
+  } = useVideoCallContext()
+
   // Use provided participants list (already deduplicated, local-first from context)
-  const participants = propParticipants ?? []
+  const participants = contextParticipants ?? []
 
   const gridClass = "min-[426px]:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]"
 

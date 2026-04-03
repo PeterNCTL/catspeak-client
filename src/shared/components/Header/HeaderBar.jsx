@@ -8,7 +8,7 @@ import HeaderGuestControls from "./HeaderGuestControls"
 import LanguageSwitcher from "@/shared/components/ui/LanguageSwitcher"
 import { useAuth } from "@/features/auth"
 
-const HeaderBar = ({ onGetStarted }) => {
+const HeaderBar = ({ onGetStarted, hideDesktopNav }) => {
   const { isAuthenticated: isLoggedIn } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -18,7 +18,7 @@ const HeaderBar = ({ onGetStarted }) => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
-      <div className="flex items-center justify-between w-full px-4 md:px-8 py-3">
+      <div className="flex items-center justify-between w-full px-4 md:px-8 py-3 h-[72px]">
         {/* Left Section: Burger (Mobile) + Logo */}
         <div className="flex-1 flex justify-start items-center gap-2">
           <button
@@ -35,9 +35,11 @@ const HeaderBar = ({ onGetStarted }) => {
         </div>
 
         {/* Center Section: Desktop Nav */}
-        <div className="hidden lg:block">
-          <DesktopNav />
-        </div>
+        {!hideDesktopNav && (
+          <div className="hidden lg:block">
+            <DesktopNav />
+          </div>
+        )}
 
         {/* Right Section: Controls */}
         <div className="flex-1 flex justify-end">

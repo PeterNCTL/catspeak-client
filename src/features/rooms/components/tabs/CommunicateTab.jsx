@@ -4,11 +4,16 @@ import { useSearchParams } from "react-router-dom"
 import RoomCard from "../RoomCard"
 import CategoryRoomSection from "../sections/CategoryRoomSection"
 import EmptyRoomState from "../EmptyRoomState"
+import LevelFilter from "../filters/LevelFilter"
+import TopicFilter from "../filters/TopicFilter"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { AnimatePresence } from "framer-motion"
 import { FadeAnimation } from "@/shared/components/ui/animations"
 import Breadcrumb from "@/shared/components/ui/navigation/Breadcrumb"
-import { categoryFriendlyNames, getSections } from "../../config/communicateTabConfig"
+import {
+  categoryFriendlyNames,
+  getSections,
+} from "../../config/communicateTabConfig"
 
 const CommunicateTab = ({
   rooms = [], // Only used in Filtered View
@@ -54,7 +59,7 @@ const CommunicateTab = ({
         >
           {isFilteredView ? (
             <div className="w-full flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
                 <Breadcrumb
                   items={[
                     {
@@ -76,6 +81,11 @@ const CommunicateTab = ({
                     },
                   ]}
                 />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <LevelFilter />
+                <TopicFilter />
               </div>
 
               {rooms.length > 0 ? (

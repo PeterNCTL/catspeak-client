@@ -20,7 +20,7 @@ const useResponsiveItemsPerPage = () => {
   }, [])
 
   if (width <= MOBILE_MAX) return null // mobile: use touch scroll
-  if (width < DESKTOP_MIN) return 2 // tablet: 2 columns
+  if (width <= DESKTOP_MIN) return 2 // tablet: 2 columns
   return 4 // desktop: 4 columns
 }
 

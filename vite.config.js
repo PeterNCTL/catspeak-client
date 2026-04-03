@@ -1,21 +1,34 @@
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv } from "vite"
 import react from "@vitejs/plugin-react"
 import path from "path"
 import { fileURLToPath } from "url"
+import livekitDevToken from "./plugins/livekitDevToken.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => {
+  // Load .env.development.local vars into process.env (for server-side plugins)
+  const env = loadEnv(mode, process.cwd(), "")
+  Object.assign(process.env, env)
+
+  return {
+  plugins: [react(), livekitDevToken()],
   server: {
     proxy: {
       "/api": {
-        target: "https://api.catspeak.com.vn",
+        target: "https://stagingapi.catspeak.com.vn",
         changeOrigin: true,
         secure: true,
       },
+      "/hubs": {
+        target: "https://stagingapi.catspeak.com.vn",
+        changeOrigin: true,
+        secure: true,
+        ws: true,
+      },
+
     },
   },
   build: {
@@ -47,4 +60,4 @@ export default defineConfig({
       "@context": path.resolve(__dirname, "./src/shared/context"),
     },
   },
-})
+}})

@@ -1,17 +1,15 @@
 import { Mic, MicOff, Video, VideoOff } from "lucide-react"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import Avatar from "@/shared/components/ui/Avatar"
+import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
 
 /**
  * A single row in the participant list.
  * Uses LiveKit Participant object properties directly.
  */
-const ParticipantItem = ({
-  participant,
-  localMicOn,
-  localCameraOn,
-}) => {
+const ParticipantItem = ({ participant }) => {
   const { t } = useLanguage()
+  const { micOn: localMicOn, cameraOn: localCameraOn } = useVideoCallContext()
   const pl = t.rooms.videoCall.participantList
 
   const isLocal = participant.isLocal
@@ -39,19 +37,11 @@ const ParticipantItem = ({
 
 /**
  * Participant list panel.
- *
- * Props:
- *  participants    – ordered array of LiveKit Participant objects (local first)
- *  localMicOn      – reactive local mic state from useVideoCall()
- *  localCameraOn   – reactive local cam state from useVideoCall()
+ * Reads participants and local media state from VideoCallContext.
  */
-const ParticipantList = ({
-  participants,
-  localMicOn,
-  localCameraOn,
-  hideTitle,
-}) => {
+const ParticipantList = ({ hideTitle }) => {
   const { t } = useLanguage()
+  const { participants } = useVideoCallContext()
   const pl = t.rooms.videoCall.participantList
 
   return (
@@ -69,8 +59,6 @@ const ParticipantList = ({
             <li key={participant.identity}>
               <ParticipantItem
                 participant={participant}
-                localMicOn={localMicOn}
-                localCameraOn={localCameraOn}
               />
             </li>
           ))}
