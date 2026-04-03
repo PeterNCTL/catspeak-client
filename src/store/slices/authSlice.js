@@ -38,7 +38,7 @@ const authSlice = createSlice({
       const { user, token, refreshToken } = action.payload
       state.user = user
       state.token = token
-      state.refreshToken = refreshToken
+      state.refreshToken = refreshToken || state.refreshToken
       state.status = "succeeded"
 
       localStorage.setItem("user", JSON.stringify(user))
@@ -48,7 +48,10 @@ const authSlice = createSlice({
       // Diagnostic: log token expiry so we can correlate with 401 events
       const exp = decodeJwtExp(token)
       if (exp) {
-        console.info(AUTH_LOG, `Credentials set — token expires at ${exp.toISOString()}`)
+        console.info(
+          AUTH_LOG,
+          `Credentials set — token expires at ${exp.toISOString()}`,
+        )
       }
     },
     logout: (state) => {

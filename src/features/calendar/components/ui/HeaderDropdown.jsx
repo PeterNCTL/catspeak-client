@@ -36,7 +36,7 @@ const HeaderDropdown = ({ triggerIcon, label, children }) => {
 
       <AnimatePresence>
         {isOpen && (
-          <div className="absolute z-50 mt-2 right-0 min-w-[150px] w-auto origin-top-right pointer-events-none">
+          <div className="absolute z-50 mt-2 min-w-[150px] w-auto pointer-events-none left-0 origin-top-left sm:left-auto sm:right-0 sm:origin-top-right">
             <FluentAnimation
               direction="down"
               exit={true}

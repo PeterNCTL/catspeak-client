@@ -62,12 +62,27 @@ async function ensureRefresh(api, extraOptions, reason) {
   const lsRefresh = refreshToken || localStorage.getItem("refreshToken")
 
   if (!lsRefresh || !lsToken) {
-    console.warn(AUTH_LOG, "No refresh token available — logging out", { reason })
+    console.warn(AUTH_LOG, "No refresh token available — logging out", {
+      reason,
+    })
     api.dispatch(logout())
     return false
   }
 
-  console.info(AUTH_LOG, `Starting token refresh (reason: ${reason})`)
+  console.info(AUTH_LOG, `Starting token refresh (reason: ${reason})`, {
+    tokenExp: decodeJwtPayload(lsToken)?.exp
+      ? new Date(decodeJwtPayload(lsToken).exp * 1000).toISOString()
+      : "unknown",
+    tokenSecondsLeft: Math.round(tokenSecondsRemaining(lsToken)),
+    tokenExpired: tokenSecondsRemaining(lsToken) < 0,
+    refreshTokenPreview: lsRefresh?.slice(-8),
+    stateHasToken: !!api.getState().auth.token,
+    stateHasRefresh: !!api.getState().auth.refreshToken,
+    lsHasToken: !!localStorage.getItem("token"),
+    lsHasRefresh: !!localStorage.getItem("refreshToken"),
+    stateAndLsTokenMatch: api.getState().auth.token === localStorage.getItem("token"),
+    stateAndLsRefreshMatch: api.getState().auth.refreshToken === localStorage.getItem("refreshToken"),
+  })
 
   refreshPromise = (async () => {
     try {
@@ -84,7 +99,11 @@ async function ensureRefresh(api, extraOptions, reason) {
       if (refreshResult.error) {
         const status = refreshResult.error.status
         const details = refreshResult.error.data
-        console.error(AUTH_LOG, `Refresh failed with status ${status} — logging out`, { reason, details, fullError: refreshResult.error })
+        console.error(
+          AUTH_LOG,
+          `Refresh failed with status ${status} — logging out`,
+          { reason, details, fullError: refreshResult.error },
+        )
         api.dispatch(logout())
         return false
       }
@@ -105,11 +124,15 @@ async function ensureRefresh(api, extraOptions, reason) {
         return true
       }
 
-      console.error(AUTH_LOG, "Refresh returned no data — logging out", { reason })
+      console.error(AUTH_LOG, "Refresh returned no data — logging out", {
+        reason,
+      })
       api.dispatch(logout())
       return false
     } catch (err) {
-      console.error(AUTH_LOG, "Refresh threw an exception — logging out", err, { reason })
+      console.error(AUTH_LOG, "Refresh threw an exception — logging out", err, {
+        reason,
+      })
       api.dispatch(logout())
       return false
     } finally {
@@ -137,7 +160,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
           AUTH_LOG,
           `Token expires in ${Math.round(remaining)}s — proactively refreshing before ${url}`,
         )
-        await ensureRefresh(api, extraOptions, `proactive (${Math.round(remaining)}s left)`)
+        await ensureRefresh(
+          api,
+          extraOptions,
+          `proactive (${Math.round(remaining)}s left)`,
+        )
       }
     }
   }
@@ -160,7 +187,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       // Retry the original request with the new token
       result = await baseQuery(args, api, extraOptions)
       if (result.error) {
-        console.error(AUTH_LOG, `Retry of ${url} still failed with status ${result.error.status}`)
+        console.error(
+          AUTH_LOG,
+          `Retry of ${url} still failed with status ${result.error.status}`,
+        )
       }
     }
   }
@@ -171,13 +201,19 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     result.error?.status === 502 ||
     result.error?.status === 503
   ) {
-    console.warn(AUTH_LOG, `Server unreachable for ${url} — not an auth issue, skipping logout`)
+    console.warn(
+      AUTH_LOG,
+      `Server unreachable for ${url} — not an auth issue, skipping logout`,
+    )
     api.dispatch(setServerDown())
   }
 
   // ── Recovery: clear server-down flag when a request succeeds ───
   if (!result.error && api.getState().serverStatus.isServerDown) {
-    console.info(AUTH_LOG, "Server is reachable again — clearing server-down flag")
+    console.info(
+      AUTH_LOG,
+      "Server is reachable again — clearing server-down flag",
+    )
     api.dispatch(setServerUp())
   }
 

@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import HeaderDropdown from "./HeaderDropdown"
 import { COLORS } from "@/shared/constants/constants"
 
-
 const ColorDropdown = ({ value, onChange }) => {
   const [selectedColor, setSelectedColor] = useState(value || "transparent")
 

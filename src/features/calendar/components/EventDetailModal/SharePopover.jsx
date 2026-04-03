@@ -1,12 +1,16 @@
 import React from "react"
 import { Share2, Copy, Check, Loader2 } from "lucide-react"
+import { AnimatePresence } from "framer-motion"
+import FluentAnimation from "@/shared/components/ui/animations/FluentAnimation"
 import useEventShare from "../../hooks/useEventShare"
+import { useLanguage } from "@/shared/context/LanguageContext"
 
 /**
  * Self-contained share button with a popover that shows the generated link
  * and a copy-to-clipboard action.
  */
 const SharePopover = ({ eventId }) => {
+  const { t } = useLanguage()
   const {
     shareRef,
     sharePopoverOpen,
@@ -22,42 +26,44 @@ const SharePopover = ({ eventId }) => {
       <button
         onClick={handleShare}
         disabled={isSharing}
-        className="bg-[#F2F2F2] hover:bg-[#D9D9D9] transition-colors shrink-0 flex items-center justify-center rounded-full w-12 h-12 disabled:opacity-50"
-        title="Chia sẻ sự kiện"
+        className="bg-[#F2F2F2] hover:bg-[#D9D9D9] transition-colors shrink-0 flex items-center justify-center rounded-full w-10 h-10 disabled:opacity-50"
+        title={t.calendar?.shareEvent || "Chia sẻ sự kiện"}
       >
-        {isSharing ? (
-          <Loader2 size={22} className="animate-spin" />
-        ) : (
-          <Share2 size={22} />
-        )}
+        {isSharing ? <Loader2 className="animate-spin" /> : <Share2 />}
       </button>
 
-      {sharePopoverOpen && shareUrl && (
-        <div className="absolute bottom-12 right-0 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl p-4 z-50">
-          <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">
-            Chia sẻ liên kết
-          </p>
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-            <span className="flex-1 text-sm text-gray-700 truncate select-all">
-              {shareUrl}
-            </span>
-            <button
-              onClick={handleCopy}
-              className="shrink-0 text-gray-400 hover:text-blue-600 transition-colors"
-              title="Sao chép"
-            >
-              {copied ? (
-                <Check size={16} className="text-green-500" />
-              ) : (
-                <Copy size={16} />
-              )}
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2">
-            Liên kết hết hạn sau 7 ngày
-          </p>
-        </div>
-      )}
+      <AnimatePresence>
+        {sharePopoverOpen && shareUrl && (
+          <FluentAnimation
+            direction="up"
+            exit
+            className="absolute bottom-12 right-0 z-50"
+          >
+            <div className="w-80 bg-white border border-[#e5e5e5] rounded-xl shadow-xl p-5">
+              <p className="text-sm mb-2">{t.calendar?.shareLink || "Chia sẻ liên kết"}</p>
+              <div className="mb-1 h-10 flex items-center gap-2 bg-[#f2f2f2] border border-[#e5e5e5] rounded-xl px-3 py-2">
+                <span className="flex-1 text-sm truncate select-all">
+                  {shareUrl}
+                </span>
+                <button
+                  onClick={handleCopy}
+                  className="shrink-0 hover:text-[#990011] transition-colors"
+                  title={t.calendar?.copy || "Sao chép"}
+                >
+                  {copied ? (
+                    <Check size={16} className="text-green-500" />
+                  ) : (
+                    <Copy size={16} />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-[#606060]">
+                {t.calendar?.linkExpires || "Liên kết hết hạn sau 7 ngày"}
+              </p>
+            </div>
+          </FluentAnimation>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

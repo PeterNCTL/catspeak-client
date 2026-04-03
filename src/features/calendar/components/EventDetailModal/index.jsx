@@ -21,6 +21,8 @@ const EventDetailModal = ({ event, onClose }) => {
   const ev = detail ?? event
   const headerColor = ev.color || "#B91264"
 
+  console.log(detail)
+
   if (isEditing) {
     return (
       <CreateEventModal editEvent={ev} onClose={() => setIsEditing(false)} />
@@ -33,32 +35,37 @@ const EventDetailModal = ({ event, onClose }) => {
       open={!!event}
       onClose={onClose}
       showCloseButton={false}
-      className="p-0 !max-w-[700px] w-full bg-[#F2F2F2] rounded-[20px] overflow-visible"
+      className="p-0 !max-w-[700px] w-full bg-[#F2F2F2] rounded-none min-[426px]:rounded-xl overflow-visible"
     >
-      <div className="relative flex flex-col w-full h-full bg-white rounded-[20px]">
+      <div className="relative flex flex-col w-full h-full bg-white rounded-none min-[426px]:rounded-xl">
+
         {/* Floating close button */}
         <button
           onClick={onClose}
-          className="absolute -top-5 -right-5 bg-[#B81919] text-white p-2 rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3)] z-50 hover:bg-red-800 transition-colors border-[4px] border-white"
+          className="hidden min-[426px]:block absolute -top-5 -right-5 bg-[#B81919] text-white p-2 rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3)] z-50 hover:bg-red-800 transition-colors border-[4px] border-white"
         >
           <X size={26} strokeWidth={4} />
         </button>
 
-        <EventDetailHeader ev={ev} headerColor={headerColor} />
+        <div className="flex-1 overflow-y-auto">
+          <EventDetailHeader ev={ev} headerColor={headerColor} onClose={onClose} />
 
-        <EventDetailBody
-          ev={ev}
-          event={event}
-          headerColor={headerColor}
-          isLoading={isLoading}
-        />
+          <EventDetailBody
+            ev={ev}
+            event={event}
+            headerColor={headerColor}
+            isLoading={isLoading}
+          />
+        </div>
 
-        <EventDetailFooter
-          eventId={eventId}
-          event={event}
-          onClose={onClose}
-          onEdit={() => setIsEditing(true)}
-        />
+        <div className="shrink-0 bg-white min-[426px]:rounded-b-xl">
+          <EventDetailFooter
+            eventId={eventId}
+            event={event}
+            onClose={onClose}
+            onEdit={() => setIsEditing(true)}
+          />
+        </div>
       </div>
     </Modal>
   )

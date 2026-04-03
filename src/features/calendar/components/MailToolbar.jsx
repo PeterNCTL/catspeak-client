@@ -35,8 +35,8 @@ const MailToolbar = () => {
 
   return (
     <>
-      <div className="flex flex-col xl:flex-row items-center justify-between w-full mb-4 gap-4">
-        {/* Filters Left */}
+      <div className="flex flex-col xl:flex-row items-center justify-end w-full mb-4 gap-4">
+        {/* Filters Left - hidden until backend API is ready
         <div className="flex items-center gap-2 flex-wrap w-full xl:w-auto pb-2 xl:pb-0">
           {FILTER_CONFIGS.map((filter, idx) => (
             <FilterDropdown
@@ -47,9 +47,11 @@ const MailToolbar = () => {
             />
           ))}
         </div>
+        */}
 
         {/* Search and Create Right */}
-        <div className="flex items-center gap-3 w-full xl:w-auto shrink-0 mt-2 xl:mt-0">
+        <div className="flex justify-end items-center gap-3 w-full xl:w-auto shrink-0 mt-2 xl:mt-0">
+          {/* Search - hidden until backend API is ready
           <div className="relative flex items-center w-full sm:w-[320px]">
             <input
               type="text"
@@ -61,9 +63,10 @@ const MailToolbar = () => {
               size={20}
             />
           </div>
+          */}
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center justify-center h-10 w-10 rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow hover:bg-gray-50 transition-all shrink-0"
+            className="flex items-center justify-center h-10 w-10 rounded-full bg-[#F2F2F2] hover:bg-[#D9D9D9] transition-all shrink-0"
             title="Create New"
           >
             <Plus size={24} color="#8e0000" strokeWidth={1.5} />

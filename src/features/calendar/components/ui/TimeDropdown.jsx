@@ -88,8 +88,7 @@ const TimeDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center border rounded-md p-4 text-gray-800 shadow-sm hover:bg-gray-50 transition-colors outline-none bg-white h-full"
-        style={{ borderColor: colors.border }}
+        className="text-sm flex items-center justify-center border border-[#c6c6c6] rounded-md px-4 h-10 text-gray-800 shadow-sm hover:bg-gray-50 transition-colors outline-none bg-white"
       >
         <span>{selectedTime}</span>
       </button>

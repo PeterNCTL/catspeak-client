@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { useMemo } from "react"
 import DatePicker from "@/shared/components/ui/inputs/DatePicker"
 import TimeDropdown from "../ui/TimeDropdown"
 import TimezoneDropdown from "../ui/TimezoneDropdown"
@@ -7,22 +8,11 @@ import RecurrenceDays from "../ui/RecurrenceDays"
 import RecurrenceIntervalRow from "./RecurrenceIntervalRow"
 import { formatTime } from "@/shared/utils/dateFormatter"
 import { colors } from "@/shared/utils/colors"
+import { useLanguage } from "@/shared/context/LanguageContext"
 
 /** Safely converts a Firestore Timestamp or plain Date to a JS Date */
 const toDate = (value) =>
   value && typeof value.toDate === "function" ? value.toDate() : value
-
-/** Human-readable unit label per recurrence option */
-const INTERVAL_UNIT = {
-  "Hàng ngày": "ngày",
-  "Hàng tuần": "tuần",
-  "Hàng tháng": "tháng",
-  "Hàng năm": "năm",
-  "Tùy chỉnh...": "tuần",
-}
-
-const WEEKLY_OPTIONS = ["Hàng tuần", "Tùy chỉnh..."]
-const CUSTOM_OPTION = "Tùy chỉnh..."
 
 const EventDateTimeSection = ({
   eventColor,
@@ -41,18 +31,39 @@ const EventDateTimeSection = ({
   recurrenceEndDate,
   onRecurrenceEndDateChange,
 }) => {
-  const isRecurring = recurrenceOption !== "Không lặp lại"
+  const { t } = useLanguage()
+  const cal = t.calendar
+
+  /** Human-readable unit label per recurrence option */
+  const INTERVAL_UNIT = useMemo(
+    () => ({
+      [cal.recurrence.daily]: cal.intervalUnit.day,
+      [cal.recurrence.weekly]: cal.intervalUnit.week,
+      [cal.recurrence.monthly]: cal.intervalUnit.month,
+      [cal.recurrence.yearly]: cal.intervalUnit.year,
+      [cal.recurrence.custom]: cal.intervalUnit.week,
+    }),
+    [cal],
+  )
+
+  const WEEKLY_OPTIONS = useMemo(
+    () => [cal.recurrence.weekly, cal.recurrence.custom],
+    [cal],
+  )
+
+  const isRecurring = recurrenceOption !== cal.recurrence.noRepeat
   const isWeekly = WEEKLY_OPTIONS.includes(recurrenceOption)
-  const intervalUnit = INTERVAL_UNIT[recurrenceOption] ?? "lần"
+  const intervalUnit =
+    INTERVAL_UNIT[recurrenceOption] ?? cal.intervalUnit.default
 
   return (
     <div className="flex flex-col gap-4 items-start pb-2 w-full">
       {/* Start / End time */}
-      <div className="flex flex-col md:flex-row gap-4 md:gap-2 w-full xl:w-auto">
-        <div className="flex flex-col gap-[14px] w-full md:w-auto">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-2 w-full xl:w-auto">
+        <div className="flex flex-col justify-between gap-3 w-full md:w-auto">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
             <span className="text-base font-bold text-gray-900 w-[150px] shrink-0">
-              Thời gian bắt đầu
+              {cal.startTime}
             </span>
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
               <DatePicker
@@ -79,7 +90,7 @@ const EventDateTimeSection = ({
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
             <span className="text-base font-bold text-gray-900 w-[150px] shrink-0">
-              Thời gian kết thúc
+              {cal.endTime}
             </span>
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
               <DatePicker
@@ -124,7 +135,7 @@ const EventDateTimeSection = ({
         {isRecurring && (
           <div className="flex flex-col gap-3 w-full">
             {/* Interval row — only shown for custom recurrence */}
-            {recurrenceOption === CUSTOM_OPTION && (
+            {recurrenceOption === cal.recurrence.custom && (
               <RecurrenceIntervalRow
                 intervalUnit={intervalUnit}
                 value={recurrenceInterval}
@@ -150,7 +161,7 @@ const EventDateTimeSection = ({
                 className="text-base font-medium"
                 style={{ color: colors.textGray }}
               >
-                Kết thúc vào:
+                {cal.endsOn}
               </span>
               <DatePicker
                 value={recurrenceEndDate}

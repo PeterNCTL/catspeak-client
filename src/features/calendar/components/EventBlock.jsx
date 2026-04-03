@@ -10,6 +10,7 @@ const EventBlock = ({
   onClick,
   colWidth = 180,
 }) => {
+  console.log(event)
   const start = parseTime(event.startTime)
   const end = parseTime(event.endTime)
   // Minimum height of 70px to fit contents neatly
@@ -39,7 +40,7 @@ const EventBlock = ({
         <span className="font-bold text-base truncate">{event.title}</span>
       </div>
 
-      <div className="flex flex-col gap-1.5 text-sm font-medium pl-1 overflow-y-auto no-scrollbar pb-1">
+      <div className="flex flex-col gap-1.5 text-sm font-medium pl-1 overflow-y-auto [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#990011] hover:[&::-webkit-scrollbar-thumb]:bg-[#7a000e] [&::-webkit-scrollbar-thumb]:rounded-[2px] pb-1 pr-1">
         <div className="flex items-center gap-2">
           <Clock size={12} className="shrink-0" />
           <span className="truncate">

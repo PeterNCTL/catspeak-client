@@ -96,8 +96,7 @@ const DatePicker = ({ value, onChange, color = "#B91264", className = "" }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center border rounded-md whitespace-nowrap text-center p-4 shadow-sm hover:bg-gray-50 transition-colors bg-white outline-none h-full text-gray-800"
-        style={{ borderColor: colors.border }}
+        className="text-sm flex items-center justify-center border border-[#c6c6c6] rounded-md whitespace-nowrap text-center px-4 h-10 shadow-sm hover:bg-gray-50 transition-colors bg-white outline-none text-gray-800"
       >
         <span>{formatVietnameseDate(date)}</span>
       </button>
@@ -109,7 +108,6 @@ const DatePicker = ({ value, onChange, color = "#B91264", className = "" }) => {
               direction="down"
               exit={true}
               className="pointer-events-auto bg-white border rounded-lg shadow-xl p-4 flex flex-col"
-              style={{ borderColor: colors.border }}
             >
               {/* Header with Month Selection and Chevrons */}
               <div className="flex items-center justify-between mb-4">

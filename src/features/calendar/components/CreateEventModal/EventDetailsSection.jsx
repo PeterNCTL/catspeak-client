@@ -1,4 +1,6 @@
 import { MapPin } from "lucide-react"
+import TextInput from "@/shared/components/ui/inputs/TextInput"
+import { useLanguage } from "@/shared/context/LanguageContext"
 
 const EventDetailsSection = ({
   eventColor,
@@ -11,6 +13,9 @@ const EventDetailsSection = ({
   conditionsInput,
   onConditionsChange,
 }) => {
+  const { t } = useLanguage()
+  const cal = t.calendar
+
   const handleOpenMaps = () => {
     const loc = eventLocation.trim()
     if (!loc) return
@@ -27,25 +32,26 @@ const EventDetailsSection = ({
   }
 
   return (
-    <div className="flex flex-col gap-[22px] mt-2">
+    <div className="flex flex-col gap-3 mt-2">
       {/* Location */}
-      <div className="flex items-center">
-        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0">
-          Địa điểm
+      <div className="flex items-center max-[425px]:flex-col max-[425px]:items-start max-[425px]:gap-1">
+        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 max-[425px]:w-full">
+          {cal.location}
         </div>
-        <div className="flex-1 flex items-center border-b-[1.5px] border-gray-200 pb-[6px]">
-          <input
-            type="text"
+        <div className="flex-1 flex items-center w-full relative">
+          <TextInput
             value={eventLocation}
             onChange={(e) => onLocationChange(e.target.value)}
-            placeholder="Nhập địa điểm hoặc link từ ggmap"
-            className="w-full text-gray-500 placeholder-gray-500 text-base outline-none pr-2"
+            placeholder={cal.locationPlaceholder}
+            variant="square"
+            containerClassName="w-full"
+            className="pr-10"
           />
           <button
             type="button"
             onClick={handleOpenMaps}
-            className="text-gray-400 hover:text-[#B91264] transition-colors flex-shrink-0"
-            title="Mở Google Maps"
+            className="absolute right-3 text-gray-400 hover:text-[#B91264] transition-colors flex-shrink-0"
+            title={cal.openMaps}
           >
             <MapPin size={20} />
           </button>
@@ -53,49 +59,51 @@ const EventDetailsSection = ({
       </div>
 
       {/* Description */}
-      <div className="flex items-center">
-        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0">
-          Mô tả
+      <div className="flex items-center max-[425px]:flex-col max-[425px]:items-start max-[425px]:gap-1">
+        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 max-[425px]:w-full">
+          {cal.description}
         </div>
-        <div className="flex-1 flex items-center border-b-[1.5px] border-gray-200 pb-[6px]">
-          <input
-            type="text"
+        <div className="flex-1 flex items-center w-full">
+          <TextInput
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
-            placeholder="Nhập mô tả (tối đa 500 từ)"
-            className="w-full text-gray-500 placeholder-gray-500 text-base outline-none"
+            placeholder={cal.descriptionPlaceholder}
+            variant="square"
+            containerClassName="w-full"
           />
         </div>
       </div>
 
       {/* Max participants */}
-      <div className="flex items-center">
-        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 mt-1">
-          Số lượng tối đa
+      <div className="flex items-center max-[425px]:flex-col max-[425px]:items-start max-[425px]:gap-1">
+        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 mt-1 max-[425px]:w-full max-[425px]:mt-0">
+          {cal.maxParticipants}
         </div>
-        <div className="border border-gray-200 rounded-[5px] w-14 shadow-sm flex items-center justify-center bg-white px-2 py-1">
-          <input
+        <div className="flex items-center w-full">
+          <TextInput
             type="number"
             value={maxParticipants}
             onChange={(e) => onMaxParticipantsChange(e.target.value)}
-            className="w-full text-center text-black text-base outline-none"
+            variant="square"
+            className="text-center !px-2"
+            containerClassName="w-20"
           />
+          <span className="text-[#606060] ml-3">{cal.guest}</span>
         </div>
-        <span className="text-gray-500 text-base ml-2">Khách</span>
       </div>
 
       {/* Conditions */}
-      <div className="flex items-start">
-        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 pt-[3px]">
-          Điều kiện
+      <div className="flex items-start max-[425px]:flex-col max-[425px]:gap-1">
+        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 pt-[10px] max-[425px]:pt-0 max-[425px]:w-full">
+          {cal.conditions}
         </div>
-        <div className="flex-1 flex flex-col border-b-[1.5px] border-gray-200 pb-[6px] gap-1">
-          <input
-            type="text"
+        <div className="flex-1 flex flex-col gap-1 w-full relative">
+          <TextInput
             value={conditionsInput}
             onChange={(e) => onConditionsChange(e.target.value)}
-            placeholder="Nhập điều kiện, phân cách bằng dấu phẩy"
-            className="w-full text-gray-500 placeholder-gray-500 text-base outline-none"
+            placeholder={cal.conditionsPlaceholder}
+            variant="square"
+            containerClassName="w-full"
           />
           {conditionsInput.trim() && (
             <div className="flex flex-wrap gap-1 mt-1">
@@ -118,19 +126,19 @@ const EventDetailsSection = ({
       </div>
 
       {/* Ticket price (static / coming soon) */}
-      <div className="flex items-center">
-        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0">
-          Giá vé
+      <div className="flex items-center max-[425px]:flex-col max-[425px]:items-start max-[425px]:justify-between max-[425px]:gap-1">
+        <div className="w-[150px] font-bold text-base text-gray-900 shrink-0 max-[425px]:w-full">
+          {cal.ticketPrice}
         </div>
-        <div className="flex-1 flex items-center justify-between border-b-[1.5px] border-gray-200 pb-[6px]">
-          <span className="text-gray-500 text-base">Free</span>
+        <div className="flex-1 flex items-center justify-between w-full h-10 border border-transparent max-[425px]:p-0">
+          <span className="text-[#606060] text-base">{cal.free}</span>
           <button
             type="button"
             disabled
-            className="font-bold text-base pr-1 transition-opacity duration-300 opacity-50 cursor-not-allowed"
+            className="font-bold text-base transition-opacity duration-300 opacity-50 cursor-not-allowed"
             style={{ color: eventColor }}
           >
-            Edit
+            {cal.edit}
           </button>
         </div>
       </div>

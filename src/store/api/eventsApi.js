@@ -98,6 +98,29 @@ export const eventsApi = baseApi.injectEndpoints({
     getSharedEvent: builder.query({
       query: (token) => `/v1/events/shared/${token}`,
     }),
+
+    // POST /api/v1/registrations
+    registerForEvent: builder.mutation({
+      query: (body) => ({
+        url: "/v1/registrations",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: (result, error, { eventId }) => [
+        { type: "Events", id: eventId },
+        "Events",
+      ],
+    }),
+
+    // DELETE /api/v1/registrations/{registrationId}
+    cancelRegistration: builder.mutation({
+      query: ({ registrationId, ...body }) => ({
+        url: `/v1/registrations/${registrationId}`,
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["Events"],
+    }),
   }),
 })
 
@@ -112,4 +135,6 @@ export const {
   useGetRegisteredEventsQuery,
   useCreateSharedLinkMutation,
   useGetSharedEventQuery,
+  useRegisterForEventMutation,
+  useCancelRegistrationMutation,
 } = eventsApi

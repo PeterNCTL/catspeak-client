@@ -13,20 +13,24 @@ const Modal = ({
 }) => {
 const ModalScrollLock = () => {
   useEffect(() => {
+    const htmlEl = document.documentElement
     const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth
+      window.innerWidth - htmlEl.clientWidth
 
     const originalStyle = window.getComputedStyle(document.body).overflow
     const originalPaddingRight = window.getComputedStyle(document.body).paddingRight
+    const originalScrollbarGutter = window.getComputedStyle(htmlEl).scrollbarGutter
 
     if (scrollbarWidth > 0) {
       document.body.style.paddingRight = `calc(${originalPaddingRight} + ${scrollbarWidth}px)`
     }
     document.body.style.overflow = "hidden"
+    htmlEl.style.scrollbarGutter = "auto"
 
     return () => {
       document.body.style.overflow = originalStyle
       document.body.style.paddingRight = originalPaddingRight
+      htmlEl.style.scrollbarGutter = originalScrollbarGutter
     }
   }, [])
 

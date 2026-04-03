@@ -1,89 +1,129 @@
 import React from "react"
 import { formatTime, FREQUENCY_LABEL } from "../../utils/eventFormatters"
+import { useLanguage } from "@/shared/context/LanguageContext"
 
-const EventDetailBody = ({ ev, event, headerColor, isLoading }) => (
-  <div className="px-8 pt-6 pb-2 relative bg-white text-base overflow-y-auto max-h-[60vh]">
-    {isLoading ? (
-      <div className="flex items-center justify-center py-10 text-gray-400 text-sm">
-        Đang tải chi tiết…
-      </div>
-    ) : (
-      <div className="flex flex-col gap-5 text-black pr-2">
-        {/* Time */}
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold min-w-max">Thời gian:</span>
-          <span className="text-gray-800">
-            {formatTime(ev.startTime)} – {formatTime(ev.endTime)} (GMT +07:00)
-          </span>
+const EventDetailBody = ({ ev, event, headerColor, isLoading }) => {
+  const { t } = useLanguage()
+
+  return (
+    <div className="p-5 relative bg-white text-base overflow-y-auto max-h-[60vh]">
+      {isLoading ? (
+        <div className="flex items-center justify-center py-10 text-gray-400 text-sm">
+          {t.calendar?.loadingDetails || "Đang tải chi tiết…"}
         </div>
-
-        {/* Description */}
-        {ev.description && (
-          <div className="flex flex-col gap-1">
-            <span className="font-bold">Mô tả:</span>
-            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-              {ev.description}
-            </p>
+      ) : (
+        <div className="flex flex-col gap-3 text-black">
+          {/* Time */}
+          <div className="flex items-baseline gap-2">
+            <span className="font-bold min-w-max">
+              {t.calendar?.timeLabel || "Thời gian"}:
+            </span>
+            <span className="text-[#60060]">
+              {formatTime(ev.startTime)} – {formatTime(ev.endTime)} (GMT +07:00)
+            </span>
           </div>
-        )}
 
-        {/* Participants */}
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold min-w-max">Số lượng đã đăng kí:</span>
-          <span className="italic text-gray-800">
-            {event.currentParticipants ?? 0}/{ev.maxParticipants ?? "∞"}
-          </span>
-        </div>
-
-        {/* Conditions */}
-        {ev.conditions && ev.conditions.length > 0 && (
-          <div className="flex items-start gap-2">
-            <span className="font-bold min-w-max">Điều kiện:</span>
-            <div className="flex flex-wrap gap-2">
-              {ev.conditions.map((c) => (
-                <span
-                  key={c.id}
-                  title={c.description || undefined}
-                  className="italic px-3 py-0.5 rounded text-white text-sm shadow-sm leading-tight"
-                  style={{ backgroundColor: headerColor }}
-                >
-                  {c.title || c.conditionType || c.category || `#${c.id}`}
-                </span>
-              ))}
-            </div>
+          {/* Location */}
+          <div className="flex items-baseline gap-2">
+            <span className="font-bold min-w-max">
+              {t.calendar?.location || "Địa điểm"}:
+            </span>
+            <span className="text-[#60060]">
+              {ev.location || (t.calendar?.locationDefault ?? "Đại học FPT")}
+            </span>
           </div>
-        )}
 
-        {/* Recurrence */}
-        {ev.isRecurring && ev.recurrenceRule && (
-          <div className="flex flex-col gap-1">
-            <span className="font-bold">Lặp lại:</span>
-            <div className="text-sm text-gray-700 flex flex-col gap-0.5 pl-1">
-              <span>
-                {FREQUENCY_LABEL[ev.recurrenceRule.frequency] ??
-                  ev.recurrenceRule.frequency}
-                {ev.recurrenceRule.interval > 1
-                  ? ` (mỗi ${ev.recurrenceRule.interval} lần)`
-                  : ""}
+          {/* Description */}
+          {ev.description && (
+            <div className="flex items-baseline gap-2">
+              <span className="font-bold min-w-max">
+                {t.calendar?.description || "Mô tả"}:
               </span>
-              {ev.recurrenceRule.recurrenceStartDate &&
-                ev.recurrenceRule.recurrenceEndDate && (
-                  <span className="text-gray-500">
-                    {new Date(
-                      ev.recurrenceRule.recurrenceStartDate,
-                    ).toLocaleDateString("vi-VN")}
-                    {" – "}
-                    {new Date(
-                      ev.recurrenceRule.recurrenceEndDate,
-                    ).toLocaleDateString("vi-VN")}
-                  </span>
-                )}
+              <span className="text-[#60060]">{ev.description}</span>
             </div>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-)
+          )}
+
+          {/* Participants */}
+          {(ev.currentParticipants !== undefined || ev.maxParticipants) && (
+            <div className="flex items-baseline gap-2">
+              {ev.currentParticipants !== undefined ? (
+                <>
+                  <span className="font-bold min-w-max">
+                    {t.calendar?.registeredCount || "Số lượng đã đăng kí"}:
+                  </span>
+                  <span className="text-[#60060]">
+                    {ev.currentParticipants}/{ev.maxParticipants ?? "∞"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="font-bold min-w-max">
+                    {t.calendar?.maxParticipants || "Số lượng tối đa"}:
+                  </span>
+                  <span className="text-[#60060]">{ev.maxParticipants}</span>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Conditions */}
+          {ev.conditions && ev.conditions.length > 0 && (
+            <div className="flex items-baseline gap-2">
+              <span className="font-bold min-w-max">
+                {t.calendar?.conditions || "Điều kiện"}:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {ev.conditions.map((c) => (
+                  <span
+                    key={c.id}
+                    title={c.description || undefined}
+                    className="px-3 py-1 rounded-full text-white text-sm flex items-center justify-center"
+                    style={{ backgroundColor: headerColor }}
+                  >
+                    {c.title || c.conditionType || c.category || `#${c.id}`}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recurrence */}
+          {ev.isRecurring && ev.recurrenceRule && (
+            <div className="flex items-baseline gap-2">
+              <span className="font-bold min-w-max">
+                {t.calendar?.repeatLabel || "Lặp lại"}:
+              </span>
+              <div className="text-[#60060] flex gap-1">
+                <span>
+                  {FREQUENCY_LABEL[ev.recurrenceRule.frequency] ??
+                    ev.recurrenceRule.frequency}
+                  {ev.recurrenceRule.interval > 1
+                    ? ` (${t.calendar?.every || "mỗi"} ${ev.recurrenceRule.interval} ${t.calendar?.intervalUnit?.default || "lần"})`
+                    : ""}
+                  {ev.recurrenceRule.recurrenceStartDate &&
+                  ev.recurrenceRule.recurrenceEndDate
+                    ? ","
+                    : ""}
+                </span>
+                {ev.recurrenceRule.recurrenceStartDate &&
+                  ev.recurrenceRule.recurrenceEndDate && (
+                    <span className="text-[#60060]">
+                      {new Date(
+                        ev.recurrenceRule.recurrenceStartDate,
+                      ).toLocaleDateString("vi-VN")}
+                      {" – "}
+                      {new Date(
+                        ev.recurrenceRule.recurrenceEndDate,
+                      ).toLocaleDateString("vi-VN")}
+                    </span>
+                  )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default EventDetailBody

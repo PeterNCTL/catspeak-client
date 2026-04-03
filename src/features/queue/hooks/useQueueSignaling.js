@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr"
 
 import { useAuth } from "@/features/auth"
+import { store } from "@store"
 
 export const useQueueSignaling = (handlers = {}) => {
   const { token } = useAuth()
@@ -15,8 +16,10 @@ export const useQueueSignaling = (handlers = {}) => {
     handlersRef.current = handlers
   }, [handlers])
 
+  const hasToken = !!token
+
   useEffect(() => {
-    if (!token) {
+    if (!hasToken) {
       console.warn("[QueueSignalR] No token found, cannot connect.")
       return
     }
@@ -27,7 +30,7 @@ export const useQueueSignaling = (handlers = {}) => {
 
     const newConnection = new HubConnectionBuilder()
       .withUrl(hubUrl, {
-        accessTokenFactory: () => token,
+        accessTokenFactory: () => store.getState().auth.token,
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Warning)
@@ -106,7 +109,7 @@ export const useQueueSignaling = (handlers = {}) => {
       setConnectionId(null)
       connectionRef.current = null
     }
-  }, [token]) // run when token changes
+  }, [hasToken]) // only reconnect when auth status changes, not on every token refresh
 
   // Wrappers for specific hub methods - Stabilize with useCallback
   const invoke = useCallback(async (methodName, ...args) => {

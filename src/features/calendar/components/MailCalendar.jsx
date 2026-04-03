@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import dayjs from "dayjs"
 import { colors } from "@/shared/utils/colors"
-import { Cat } from "lucide-react"
+import CatIcon from "@/shared/assets/icons/logo/icon.svg"
 import MailCalendarDetail from "./MailCalendarDetail"
 import { motion } from "framer-motion"
 import { useGetEventCountsQuery } from "@/store/api/eventsApi"
@@ -49,19 +49,19 @@ const MailCalendar = ({ currentDate = dayjs() }) => {
   }
 
   return (
-    <div className="bg-white/70 backdrop-blur-md flex-1 flex flex-col w-full min-h-[350px]">
-      <div className="grid grid-cols-7 gap-2 text-center mb-4">
+    <div className="flex-1 flex flex-col w-full min-h-[350px]">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center mb-4">
         {days.map((d) => (
           <div
             key={d}
-            className="text-xs font-bold text-gray-400 uppercase tracking-wider"
+            className="text-xs font-bold text-[#606060] uppercase tracking-wider"
           >
             {d}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-x-2 gap-y-3 flex-1">
+      <div className="grid grid-cols-7 gap-x-1 sm:gap-x-2 gap-y-3 flex-1">
         {dates.map((date, idx) => {
           const isToday =
             date === dayjs().date() && currentDate.isSame(dayjs(), "month")
@@ -95,11 +95,10 @@ const MailCalendar = ({ currentDate = dayjs() }) => {
             return null
           }
 
-          // Only render visible dates
           if (!date) {
             return (
               <React.Fragment key={`empty-${idx}`}>
-                <div className="invisible aspect-[5/4]"></div>
+                <div className="invisible min-h-[80px] sm:min-h-0 sm:aspect-[5/4]"></div>
                 {renderExpandedDetail()}
               </React.Fragment>
             )
@@ -115,18 +114,16 @@ const MailCalendar = ({ currentDate = dayjs() }) => {
                 onClick={() =>
                   setSelectedDate(selectedDate === date ? null : date)
                 }
-                className={`relative flex flex-col rounded-[16px] bg-white border shadow-sm overflow-hidden cursor-pointer aspect-[5/4]
-                  ${isToday && selectedDate !== date ? "ring-2 ring-[#990011] border-transparent" : "border-[#E5E5E5]"}
-                  ${selectedDate === date ? "ring-4 ring-[#990011]/80 border-transparent shadow-md transform scale-[1.02] z-10" : ""}
+                className={`relative flex flex-col rounded-lg sm:rounded-xl bg-white border overflow-hidden cursor-pointer min-h-[80px] sm:min-h-0 sm:aspect-[5/4]
+                  ${isToday && selectedDate !== date ? "border-[#990011]" : "border-[#E5E5E5]"}
+                  ${selectedDate === date ? "ring-2 ring-[#990011]/80 transform scale-[1.02] z-10" : ""}
                 `}
               >
                 {/* Top Row: Date and Event Count */}
-                <div className="flex items-start justify-between px-2 pt-1.5 pb-1 z-10 bg-transparent leading-none">
-                  <span className="text-[1.3rem] font-light text-gray-800 font-sans tracking-tight italic">
-                    {date}
-                  </span>
+                <div className="flex items-start justify-between p-1.5 sm:p-3 z-10 text-sm sm:text-base">
+                  <span>{date}</span>
                   {eventCount > 0 && (
-                    <span className="text-[1.3rem] font-bold text-[#990011] italic leading-none">
+                    <span className="text-[#990011] font-bold text-xs sm:text-base">
                       {eventCount}
                     </span>
                   )}
@@ -145,7 +142,7 @@ const MailCalendar = ({ currentDate = dayjs() }) => {
                     .map((layer, barIdx) => (
                       <div
                         key={barIdx}
-                        className="absolute bottom-0 w-full rounded-t-[16px] transition-all"
+                        className="absolute bottom-0 w-full rounded-t-lg transition-all"
                         style={{
                           height: layer.height,
                           backgroundColor: layer.color,
@@ -156,12 +153,11 @@ const MailCalendar = ({ currentDate = dayjs() }) => {
 
                   {/* Optional Cat Icon in bottom-left */}
                   {eventCount > 0 && (
-                    <div
-                      className="absolute left-1.5 bottom-1.5 w-6 h-6 rounded-full flex items-center justify-center text-white"
-                      style={{ backgroundColor: colors.red[900], zIndex: 10 }}
-                    >
-                      <Cat size={14} className="stroke-[2.5px]" />
-                    </div>
+                    <img
+                      src={CatIcon}
+                      className="absolute left-1 sm:left-1.5 bottom-1 sm:bottom-1.5 w-4 h-4 sm:w-6 sm:h-6 z-10"
+                      alt="Cat Speak"
+                    />
                   )}
                 </div>
               </motion.div>

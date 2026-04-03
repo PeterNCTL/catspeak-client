@@ -5,7 +5,7 @@ import { useGetEventsByDateQuery } from "@/store/api/eventsApi"
 import { processOverlappingEvents } from "../utils/EventUtils"
 import TimelineGrid from "./TimelineGrid"
 import EventBlock from "./EventBlock"
-import EventDetailModal from "./EventDetailModal"
+import EventDetailModal from "./EventDetailModal/index"
 import dayjs from "dayjs"
 
 const HOUR_HEIGHT = 100 // pixels per hour
@@ -54,8 +54,7 @@ const MailCalendarDetail = ({ selectedDate, currentDate, onClose }) => {
       isRegistered: ev.isRegistered,
       currentParticipants: ev.currentParticipants,
       maxParticipants: ev.maxParticipants,
-      // EventBlock shows location; not in API response, leave blank
-      location: "",
+      location: ev.location || "",
     }))
   }, [eventsByDateData])
 
@@ -69,7 +68,7 @@ const MailCalendarDetail = ({ selectedDate, currentDate, onClose }) => {
   const eventsCanvasWidth = maxCols * COL_WIDTH
 
   return (
-    <div className="col-span-7 w-full my-2 h-full min-h-[400px] sm:min-h-[500px]">
+    <div className="col-span-7 w-full h-full min-h-[400px] sm:min-h-[500px]">
       <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-[#E5E5E5] shadow-sm p-3 sm:p-6 w-full flex flex-col h-[500px] sm:h-[700px] transition-all">
         {/* Calendar Day View Scroll Container */}
         <div

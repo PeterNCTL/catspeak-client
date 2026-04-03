@@ -39,11 +39,10 @@ const TimezoneDropdown = ({ value, onChange }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="border flex flex-col justify-center items-start gap-1 p-4 shadow-sm w-full md:w-[130px] shrink-0 bg-white hover:bg-gray-50 transition-colors rounded-[8px] text-gray-500 h-full min-h-[86px]"
-        style={{ borderColor: colors.border }}
+        className="border border-[#c6c6c6] flex flex-col justify-center items-start gap-1 p-3 shadow-sm w-full md:w-[130px] shrink-0 bg-white hover:bg-gray-50 transition-colors rounded-[8px] h-full min-h-[86px]"
       >
         <Globe size={20} />
-        <div className="text-base text-gray-800 mt-1 text-left line-clamp-2">
+        <div className="text-sm mt-1 text-left line-clamp-2">
           {selectedTz.offset}
           <br />
           {selectedTz.label}
