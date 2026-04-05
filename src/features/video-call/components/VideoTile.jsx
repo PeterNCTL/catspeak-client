@@ -1,16 +1,41 @@
 import { MicOff, VideoOff, MonitorUp } from "lucide-react"
 import Avatar from "@/shared/components/ui/Avatar"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useReducer } from "react"
 import { useIsSpeaking } from "@livekit/components-react"
-import { Track } from "livekit-client"
+import { Track, ParticipantEvent } from "livekit-client"
 
 /**
  * Renders a single participant's video tile using LiveKit.
+ *
+ * Subscribes to participant track events so that when tracks are
+ * renegotiated (e.g. during screen-share) the audio/video elements
+ * are re-attached to the current, live track objects.
  *
  * @param {{ participant: import('livekit-client').Participant }} props
  */
 const VideoTile = ({ participant, onClick }) => {
   const isSpeaking = useIsSpeaking(participant)
+
+  // Force re-render whenever tracks change on this participant so that
+  // getTrackPublication() returns the latest track references.
+  const [, forceUpdate] = useReducer((x) => x + 1, 0)
+
+  useEffect(() => {
+    const events = [
+      ParticipantEvent.TrackSubscribed,
+      ParticipantEvent.TrackUnsubscribed,
+      ParticipantEvent.TrackMuted,
+      ParticipantEvent.TrackUnmuted,
+      ParticipantEvent.TrackPublished,
+      ParticipantEvent.TrackUnpublished,
+    ]
+
+    events.forEach((evt) => participant.on(evt, forceUpdate))
+
+    return () => {
+      events.forEach((evt) => participant.off(evt, forceUpdate))
+    }
+  }, [participant])
 
   const displayName = participant.name || participant.identity || "?"
   const isLocal = participant.isLocal
