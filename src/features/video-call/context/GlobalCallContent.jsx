@@ -16,7 +16,11 @@ import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
 import { useAudioDebug } from "@/features/video-call/hooks/useAudioDebug"
-import { getNavigate, getLocation } from "@/features/video-call/hooks/useNavigateRef"
+import { useWebViewAudioFix } from "@/features/video-call/hooks/useWebViewAudioFix"
+import {
+  getNavigate,
+  getLocation,
+} from "@/features/video-call/hooks/useNavigateRef"
 
 /**
  * Rendered inside <LiveKitRoom> when a call is active.
@@ -59,6 +63,9 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   // ── Audio debug logging (remove after diagnosing audio issue) ──
   useAudioDebug()
+
+  // ── WebView audio fix (Zalo, Messenger, LINE, etc.) ──
+  useWebViewAudioFix()
 
   const chatState = useChat()
   const chatMessages = chatState.chatMessages ?? []
