@@ -10,7 +10,7 @@ import {
   MicOff,
   Phone,
 } from "lucide-react"
-import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
+import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 
 const VideoCallControlBar = ({ unreadMessages }) => {
   const {

@@ -1,6 +1,6 @@
 import VideoTile from "./VideoTile"
 import ScreenShareTile from "./ScreenShareTile"
-import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
+import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 import { useSpotlight } from "@/features/video-call/hooks/useSpotlight"
 
 /**

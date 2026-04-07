@@ -15,7 +15,7 @@ import {
 } from "@/features/video-call"
 import { formatDate } from "@/shared/utils/dateFormatter"
 
-import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
+import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 import { VideoCallProvider } from "@/features/video-call/context/VideoCallProvider"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { getTranslatedRoomName } from "@/features/rooms/utils/roomNameUtils"

@@ -15,6 +15,7 @@ import { useScreenShare } from "@/features/video-call/hooks/useScreenShare"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
+import { useAudioDebug } from "@/features/video-call/hooks/useAudioDebug"
 import { getNavigate, getLocation } from "@/features/video-call/hooks/useNavigateRef"
 
 /**
@@ -55,6 +56,9 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   const videoCallState = useVideoCall(t)
   const screenShareState = useScreenShare()
+
+  // ── Audio debug logging (remove after diagnosing audio issue) ──
+  useAudioDebug()
 
   const chatState = useChat()
   const chatMessages = chatState.chatMessages ?? []

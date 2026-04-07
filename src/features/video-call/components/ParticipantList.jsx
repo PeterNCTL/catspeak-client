@@ -1,7 +1,7 @@
 import { Mic, MicOff, Video, VideoOff } from "lucide-react"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import Avatar from "@/shared/components/ui/Avatar"
-import { useVideoCallContext } from "@/features/video-call/context/VideoCallContext"
+import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 
 /**
  * A single row in the participant list.

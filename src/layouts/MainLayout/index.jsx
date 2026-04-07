@@ -67,7 +67,7 @@ const MainLayout = ({ showHeader = true, showFooter = true }) => {
         redirectAfterLogin: authModal.redirectAfterLogin,
       }}
     >
-      <div className="flex flex-col min-h-screen bg-white text-left">
+      <div className="flex flex-col min-h-screen bg-white text-left overflow-x-clip">
         {showHeader && (
           <HeaderBar 
             onGetStarted={() => openAuthModal("login")} 
@@ -78,7 +78,7 @@ const MainLayout = ({ showHeader = true, showFooter = true }) => {
         <div className="flex flex-row flex-1 bg-white min-w-0 items-stretch">
           {!isLandingPage && <MainSidebar />}
 
-          <main className="flex-1 flex flex-col min-w-0">
+          <main className="flex-1 flex flex-col min-w-0 overflow-x-clip">
             <Outlet />
           </main>
         </div>

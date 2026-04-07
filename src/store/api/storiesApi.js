@@ -23,10 +23,10 @@ export const storiesApi = baseApi.injectEndpoints({
 
     // Get current user's stories
     getMyStories: builder.query({
-      query: (languageCommunity) =>
-        languageCommunity
-          ? `/stories/my-stories/community/${languageCommunity}`
-          : "/stories/my-stories",
+      query: (languageCommunity) => ({
+        url: "/stories/my-stories",
+        params: languageCommunity ? { languageCommunity } : undefined,
+      }),
       providesTags: ["MyStories"],
     }),
 
