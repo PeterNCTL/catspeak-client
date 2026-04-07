@@ -21,13 +21,14 @@ const P = "[ManualAudio]"
  *  - Keeps a Map<participantIdentity, { el, trackSid }> for reuse/cleanup
  *  - Elements are only fully removed when the participant disconnects
  *
- * Why reuse instead of recreate:
- *  WebView browsers (Zalo, Messenger, etc.) enforce strict autoplay
- *  policies. The initial `.play()` succeeds because the user tapped
- *  "Join" (a user gesture). If we destroy that `<audio>` and create a
- *  new one later (e.g. when a remote participant reconnects), the new
- *  `.play()` is blocked because there's no fresh user gesture. Reusing
- *  the same element preserves the autoplay privilege.
+ * WebView quirks addressed:
+ *  1. Container uses `position:absolute; opacity:0` instead of `display:none`
+ *     because some WebViews won't activate the media pipeline for elements
+ *     inside `display:none` containers.
+ *  2. An AudioContext unlock is triggered on first user gesture so that
+ *     subsequent `.play()` calls are allowed.
+ *  3. A global touch/click listener retries all paused `<audio>` elements
+ *     on the next user interaction (fallback for very strict autoplay).
  *
  * Safe on all platforms — desktop browsers work identically.
  */
@@ -36,19 +37,22 @@ export const useManualAudioRenderer = () => {
 
   // Map of participantIdentity → { el: HTMLAudioElement, trackSid: string }
   const audioMapRef = useRef(new Map())
-  // Hidden container for audio elements (lives outside React tree)
+  // Container for audio elements (lives outside React tree)
   const containerRef = useRef(null)
 
-  // ── Create / destroy the hidden container ──
+  // ── Create / destroy the container ──
+  // Uses position:absolute + opacity:0 instead of display:none.
+  // Some WebView engines (Zalo, Messenger) refuse to play media inside
+  // display:none containers.
   useEffect(() => {
     const container = document.createElement("div")
     container.id = "manual-audio-renderer"
-    container.style.display = "none"
+    container.style.cssText =
+      "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;"
     document.body.appendChild(container)
     containerRef.current = container
 
     return () => {
-      // Cleanup all audio elements
       audioMapRef.current.forEach((entry, identity) => {
         cleanupAudioElement(entry.el, identity)
       })
@@ -58,9 +62,61 @@ export const useManualAudioRenderer = () => {
     }
   }, [])
 
+  // ── AudioContext unlock + gesture-powered audio resume ──
+  // WebView browsers often keep AudioContext suspended until a user gesture.
+  // We also retry all paused <audio> elements on the first interaction.
+  useEffect(() => {
+    let unlocked = false
+
+    const unlockAudio = () => {
+      if (unlocked) return
+      unlocked = true
+
+      // 1. Resume AudioContext (needed by WebViews)
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext
+        if (AudioCtx) {
+          const ctx = new AudioCtx()
+          ctx.resume().then(() => {
+            ctx.close()
+            console.log(`${P} 🔓 AudioContext unlocked via user gesture`)
+          })
+        }
+      } catch {}
+
+      // 2. Retry all paused <audio> elements
+      audioMapRef.current.forEach((entry, identity) => {
+        if (entry.el && entry.el.paused && entry.el.srcObject) {
+          entry.el
+            .play()
+            .then(() =>
+              console.log(
+                `${P} ✅ Resumed paused audio for ${identity} via user gesture`,
+              ),
+            )
+            .catch(() => {})
+        }
+      })
+
+      // Clean up listeners after first successful unlock
+      cleanup()
+    }
+
+    const events = ["click", "touchstart", "touchend", "keydown"]
+    events.forEach((e) =>
+      document.addEventListener(e, unlockAudio, { capture: true, once: false }),
+    )
+
+    const cleanup = () => {
+      events.forEach((e) =>
+        document.removeEventListener(e, unlockAudio, { capture: true }),
+      )
+    }
+
+    return cleanup
+  }, [])
+
   // ── Core: attach an audio track to an <audio> element ──
-  // Reuses existing element for the same participant to preserve
-  // autoplay privilege in WebViews.
   const attachTrack = useCallback((track, pub, participant) => {
     const identity = participant.identity
     const sid = pub.trackSid
@@ -70,32 +126,34 @@ export const useManualAudioRenderer = () => {
 
     if (existing) {
       // Reuse the existing <audio> element — just swap the track.
-      // This preserves the autoplay privilege from the original user gesture.
       if (existing.trackSid === sid) {
-        // Same track re-subscribed (e.g. after network hiccup) — re-attach
         console.log(`${P} 🔄 Re-attaching same track for ${identity} (${sid})`)
       } else {
-        // Different track (participant reconnected) — detach old, attach new
         console.log(
           `${P} 🔄 Swapping track for ${identity}: ${existing.trackSid} → ${sid}`,
         )
       }
 
-      // Detach whatever was on the element before
-      existing.el.srcObject = null
+      // Detach old track
+      try {
+        existing.el.pause()
+        existing.el.srcObject = null
+      } catch {}
 
       // Attach the new track's MediaStream
       track.attach(existing.el)
       existing.trackSid = sid
       existing.el.setAttribute("data-track-sid", sid)
 
-      // Play — should succeed since the element already has autoplay privilege
       playWithRetry(existing.el, sid, identity)
     } else {
-      // First time seeing this participant — create a new <audio>
+      // First time — create a new <audio>
       const el = document.createElement("audio")
       el.autoplay = true
       el.playsInline = true
+      // Some WebViews need these explicitly
+      el.setAttribute("playsinline", "")
+      el.setAttribute("webkit-playsinline", "")
       el.setAttribute("data-participant", identity)
       el.setAttribute("data-track-sid", sid)
 
@@ -118,8 +176,9 @@ export const useManualAudioRenderer = () => {
 
     const entry = audioMapRef.current.get(identity)
     if (entry && entry.trackSid === sid) {
-      // Don't remove the element — just clear the srcObject.
-      // The element stays in the DOM so it retains autoplay privilege.
+      try {
+        entry.el.pause()
+      } catch {}
       entry.el.srcObject = null
       entry.trackSid = null
       console.log(
@@ -208,17 +267,21 @@ function cleanupAudioElement(el, identity) {
  * WebViews often need multiple attempts with increasing delays.
  */
 function playWithRetry(el, sid, identity, attempt = 0) {
-  const delays = [0, 200, 600, 1500, 3000]
+  const delays = [0, 100, 300, 800, 1500, 3000]
   if (attempt >= delays.length) {
     console.warn(
-      `${P} ❌ All play attempts exhausted for ${identity} (${sid})`,
+      `${P} ❌ All play attempts exhausted for ${identity} (${sid}). ` +
+        `Waiting for user gesture to resume.`,
     )
     return
   }
 
   setTimeout(() => {
-    // Bail if the element was already removed
     if (!el.parentNode) return
+
+    // Ensure the element is in a playable state
+    el.muted = false
+    el.volume = 1.0
 
     el.play()
       .then(() => {
@@ -231,7 +294,6 @@ function playWithRetry(el, sid, identity, attempt = 0) {
           `${P} ⚠️ play() failed for ${identity} (${sid}) [attempt ${attempt + 1}]:`,
           err.message,
         )
-        // Retry with next delay
         playWithRetry(el, sid, identity, attempt + 1)
       })
   }, delays[attempt])
