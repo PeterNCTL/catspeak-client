@@ -49,7 +49,7 @@ const MainSidebar = () => {
           <span className="text-sm">{t.catSpeak?.sidebar?.mail || "Mail"}</span>
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to={`/${currentLang}/cat-speak/schedules`}
           className={getLinkClasses}
         >
@@ -57,7 +57,7 @@ const MainSidebar = () => {
           <span className="text-sm">
             {t.catSpeak?.sidebar?.schedules || "Schedules"}
           </span>
-        </NavLink>
+        </NavLink> */}
       </div>
     </aside>
   )
