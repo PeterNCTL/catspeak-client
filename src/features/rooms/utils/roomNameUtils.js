@@ -44,5 +44,9 @@ export const getTranslatedRoomName = (name, t) => {
     return t.rooms.specialNames.aboutLove || name
   }
 
+  if (name === "Z世代中国文化" || name === "Văn hóa Gen Z Trung Quốc") {
+    return t.rooms.specialNames.genZChineseCulture || name
+  }
+
   return name
 }

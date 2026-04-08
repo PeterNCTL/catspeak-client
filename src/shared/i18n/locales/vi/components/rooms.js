@@ -23,6 +23,7 @@ export default {
     whatILike: "Điều tôi thích!",
     doYouLikeReading: "Bạn có thích đọc sách?",
     aboutLove: "Chuyện về tình yêu",
+    genZChineseCulture: "Văn hóa Gen Z Trung Quốc",
   },
   heroCarousel: {
     comingSoonTitle: "Sắp ra mắt",
