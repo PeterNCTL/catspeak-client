@@ -5,6 +5,7 @@ import AuthButton from "../../ui/AuthButton"
 import RequestOtpStep from "./RequestOtpStep"
 import VerifyOtpStep from "./VerifyOtpStep"
 import ResetPasswordFormStep from "./ResetPasswordFormStep"
+import { useLanguage } from "@/shared/context/LanguageContext.jsx"
 
 const STEPS = {
   REQUEST_OTP: 0,
@@ -14,6 +15,8 @@ const STEPS = {
 }
 
 const ResetPasswordPopup = ({ open, onClose, onSwitchMode }) => {
+  const { t } = useLanguage()
+  const authText = t.auth || {}
   const [currentStep, setCurrentStep] = useState(STEPS.REQUEST_OTP)
   const [email, setEmail] = useState("")
   const [token, setToken] = useState("")
@@ -50,16 +53,16 @@ const ResetPasswordPopup = ({ open, onClose, onSwitchMode }) => {
         <CheckCircle2 className="h-10 w-10 text-green-500" />
       </div>
       <h2 className="mb-2 text-2xl font-bold text-gray-900">
-        Password Changed!
+        {authText.passwordChangedTitle || "Password Changed!"}
       </h2>
       <p className="mb-8 text-sm text-gray-600">
-        Your password has been successfully updated.
+        {authText.passwordChangedSubtitle || "Your password has been successfully updated."}
       </p>
       <AuthButton
         onClick={() => onSwitchMode("login")}
         className="w-full rounded-lg"
       >
-        LOGIN NOW
+        {authText.loginNowButton || "LOGIN NOW"}
       </AuthButton>
     </div>
   )

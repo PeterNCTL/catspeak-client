@@ -29,12 +29,12 @@ const VerifyOtpStep = ({ email, onSuccess, onBack }) => {
     }
 
     try {
-      await verifyResetOtp({
+      const result = await verifyResetOtp({
         email,
         otp: otpValue,
       }).unwrap()
 
-      onSuccess(otpValue)
+      onSuccess(result.resetToken)
     } catch (err) {
       console.error("OTP verification failed:", err)
       setError(
@@ -58,7 +58,7 @@ const VerifyOtpStep = ({ email, onSuccess, onBack }) => {
         </button>
       </div>
 
-      <h2 className="mb-1 text-center text-3xl font-black text-[#8f0d15]">
+      <h2 className="mb-1 text-center text-3xl font-bold text-[#8f0d15]">
         {authText.forgotStep2Title || "Verify OTP"}
       </h2>
       <p className="mb-6 text-center text-sm text-[#7A7574]">

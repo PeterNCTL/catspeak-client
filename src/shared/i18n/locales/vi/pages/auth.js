@@ -97,4 +97,7 @@ export default {
   invalidCredentials: "Email hoặc mật khẩu không hợp lệ",
   registering: "ĐANG ĐĂNG KÝ...",
   registrationFailed: "Đăng ký thất bại. Vui lòng thử lại.",
+  passwordChangedTitle: "Đổi mật khẩu thành công!",
+  passwordChangedSubtitle: "Mật khẩu của bạn đã được cập nhật thành công.",
+  loginNowButton: "ĐĂNG NHẬP NGAY",
 }

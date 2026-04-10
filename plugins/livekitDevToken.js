@@ -26,16 +26,19 @@ export default function livekitDevToken() {
         // Parse the request body
         let body = ""
         for await (const chunk of req) body += chunk
-        const { roomName, participantIdentity, participantName } =
+        const { roomId, roomName, participantIdentity, participantName } =
           JSON.parse(body)
 
         // Generate token
+        const identity = participantIdentity || participantName
         const token = new AccessToken(apiKey, apiSecret, {
-          identity: participantIdentity,
+          identity,
           name: participantName,
         })
+        const effectiveRoomName =
+          roomName || (roomId ? `room-${roomId}` : "dev-room")
         token.addGrant({
-          room: roomName,
+          room: effectiveRoomName,
           roomJoin: true,
           canPublish: true,
           canSubscribe: true,
@@ -46,13 +49,13 @@ export default function livekitDevToken() {
         res.setHeader("Content-Type", "application/json")
         res.end(
           JSON.stringify({
-            server_url: "ws://localhost:7880",
+            server_url: "wss://livekit.catspeak.com.vn",
             participant_token: jwt,
             cathspeak: {
               account_id: null,
               room_id: null,
               session_id: null,
-              room_name: roomName,
+              room_name: effectiveRoomName,
             },
           }),
         )

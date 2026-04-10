@@ -95,4 +95,7 @@ export default {
   invalidCredentials: "Invalid email or password",
   registering: "SIGNING UP...",
   registrationFailed: "Registration failed. Please try again.",
+  passwordChangedTitle: "Password Changed!",
+  passwordChangedSubtitle: "Your password has been successfully updated.",
+  loginNowButton: "LOGIN NOW",
 }

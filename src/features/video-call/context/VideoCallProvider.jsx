@@ -153,10 +153,12 @@ const VideoCallProviderInner = ({ children, roomId, lang }) => {
 
     try {
       // 1. Fetch LiveKit token FIRST to validate connectivity
-      const tokenRes = await getLivekitToken({
+      const livekitTokenBody = {
         roomId: Number(roomId),
         participantName: user.username,
-      }).unwrap()
+      }
+      console.log("[VideoCall] POST /api/livekit/token body:", livekitTokenBody)
+      const tokenRes = await getLivekitToken(livekitTokenBody).unwrap()
 
       const token = tokenRes?.participantToken
       const serverUrl = tokenRes?.serverUrl

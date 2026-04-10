@@ -93,4 +93,7 @@ export default {
   invalidCredentials: "邮箱或密码无效",
   registering: "注册中...",
   registrationFailed: "注册失败，请重试。",
+  passwordChangedTitle: "密码修改成功！",
+  passwordChangedSubtitle: "您的密码已成功更新。",
+  loginNowButton: "立即登录",
 }
