@@ -27,13 +27,13 @@ const PasswordScreen = ({ room, error, isLoading, onSubmit }) => {
 
   return (
     <div
-      className="flex h-[100dvh] w-full flex-col bg-cover bg-center bg-no-repeat relative"
+      className="flex h-[100dvh] w-full flex-col bg-cover bg-center bg-no-repeat relative overflow-y-auto"
       style={{
         backgroundImage: `url(${room?.thumbnailUrl || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"})`,
       }}
     >
       {/* Dark blurred overlay so the background isn't distracting */}
-      <div className="absolute inset-0 bg-[#111111]/40 backdrop-blur-sm" />
+      <div className="fixed inset-0 bg-[#111111]/40 backdrop-blur-sm" />
 
       {/* Top Back Button */}
       <div className="relative z-50 w-full p-5 flex justify-start shrink-0">
@@ -53,7 +53,7 @@ const PasswordScreen = ({ room, error, isLoading, onSubmit }) => {
 
       {/* Centered Content */}
       <div className="relative z-10 flex flex-1 w-full flex-col items-center justify-center p-5">
-        <div className="bg-white p-8 sm:p-10 rounded-[28px] border border-[#E5E5E5] shadow-2xl w-full max-w-[420px] flex flex-col items-center">
+        <div className="bg-white p-5 rounded-2xl border border-[#E5E5E5] shadow-2xl w-full max-w-[420px] flex flex-col items-center">
           <form
             onSubmit={handleSubmit}
             className="flex flex-col items-center gap-6 w-full"

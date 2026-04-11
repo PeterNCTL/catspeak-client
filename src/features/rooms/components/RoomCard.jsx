@@ -13,6 +13,7 @@ import {
 import InDevelopmentModal from "@/shared/components/ui/InDevelopmentModal"
 import Modal from "@/shared/components/ui/Modal"
 import RoomFullModal from "./RoomFullModal"
+import meetingFallbackImage from "@/shared/assets/images/rooms/meeting.jpeg"
 
 import { getTranslatedRoomName } from "../utils/roomNameUtils"
 
@@ -89,14 +90,13 @@ const RoomCard = ({ room }) => {
         }}
         whileHover={{ y: -4 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
-        className="relative flex h-[320px] w-full flex-col overflow-hidden rounded-xl bg-white border border-[#E5E5E5] cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
+        className="relative flex h-full w-full flex-col overflow-hidden rounded-xl bg-white border border-[#E5E5E5] cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
       >
         {/* Cover Image Section */}
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <img
             src={
-              room.thumbnailUrl ||
-              "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+              room.thumbnailUrl || meetingFallbackImage
             }
             alt="Room Cover"
             className="h-full w-full object-cover transition-transform duration-500"

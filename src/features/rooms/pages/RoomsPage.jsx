@@ -163,7 +163,7 @@ const RoomsPage = () => {
             <RoomFilterSidebar inDrawer />
           </RoomsMobileDrawer>
 
-          <div className="flex gap-6 w-full">
+          <div className="flex gap-10 w-full">
             {/* Desktop Filter Sidebar */}
             <div className="hidden lg:block w-[280px] shrink-0">
               <RoomFilterSidebar />
