@@ -79,6 +79,17 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
       const decoded = new TextDecoder().decode(payload)
       console.log(`[LiveKit Debug] Packet Received! Topic:`, topic, `| Participant:`, participant?.identity, `| Content:`, decoded)
 
+      if (!participant) {
+        console.log("🚀 [BACKEND PAYLOAD RECEIVED] Topic:", topic);
+        console.log("Raw decoded:", decoded);
+        try {
+          const parsed = JSON.parse(decoded);
+          console.log("Parsed JSON:", parsed);
+        } catch (e) {
+          // Not a JSON payload, ignore
+        }
+      }
+
       // We accept any packet without a source participant (likely server-sent API),
       // OR specifically packets on 'lk-chat'/'system' topics.
       if (!participant || topic === "lk-chat" || topic === "system") {
