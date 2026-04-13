@@ -13,7 +13,6 @@ export {
   WaitingScreen,
   ParticipantsPreview,
   VideoPreview,
-  getTranslatedRoomName,
 } from "./components/waiting-room"
 
 // Tab Components

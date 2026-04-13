@@ -8,7 +8,6 @@ import { useSessionTimer } from "@/features/video-call/hooks/useSessionTimer"
 import { usePiPDrag } from "@/features/video-call/hooks/usePiPDrag"
 import { usePiPUnread } from "@/features/video-call/hooks/usePiPUnread"
 import { useLanguage } from "@/shared/context/LanguageContext"
-import { getTranslatedRoomName } from "@/features/rooms/utils/roomNameUtils"
 
 import PiPVideoContent from "./PiPVideoContent"
 import PiPControlBar from "./PiPControlBar"
@@ -42,13 +41,8 @@ const PiPWidget = () => {
   const unreadCount = usePiPUnread(messages, isPiP)
   const { position, constraintsRef, handleDragEnd } = usePiPDrag(isPiP)
 
-  // Translated room name
-  const rawRoomName =
-    session?.name || session?.roomName || roomData?.name || "General"
-  const roomName = React.useMemo(
-    () => getTranslatedRoomName(rawRoomName, t),
-    [rawRoomName, t?.rooms?.specialNames],
-  )
+  // Room name
+  const roomName = session?.name || session?.roomName || roomData?.name || "General"
 
   // Screen share takes priority
   const activeScreenShare =

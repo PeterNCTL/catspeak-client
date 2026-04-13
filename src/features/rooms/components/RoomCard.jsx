@@ -15,8 +15,6 @@ import Modal from "@/shared/components/ui/Modal"
 import RoomFullModal from "./RoomFullModal"
 import meetingFallbackImage from "@/shared/assets/images/rooms/meeting.jpeg"
 
-import { getTranslatedRoomName } from "../utils/roomNameUtils"
-
 const RoomCard = ({ room }) => {
   const [searchParams] = useSearchParams()
   const { language, t } = useLanguage()
@@ -24,10 +22,7 @@ const RoomCard = ({ room }) => {
   const { openAuthModal } = useAuthModal()
   const navigate = useNavigate()
 
-  const translatedName = React.useMemo(() => {
-    return getTranslatedRoomName(room.name, t)
-  }, [room.name, t.rooms.specialNames])
-
+  const translatedName = room.name
   const isRoomFull =
     room.maxParticipants !== null &&
     (room.currentParticipantCount || 0) >= room.maxParticipants

@@ -18,7 +18,6 @@ import { formatDate } from "@/shared/utils/dateFormatter"
 import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 import { VideoCallProvider } from "@/features/video-call/context/VideoCallProvider"
 import { useLanguage } from "@/shared/context/LanguageContext"
-import { getTranslatedRoomName } from "@/features/rooms/utils/roomNameUtils"
 import VideoCallLoading from "@/features/video-call/components/VideoCallLoading"
 
 const VideoCallRoomContent = () => {
@@ -48,9 +47,6 @@ const VideoCallRoomContent = () => {
   const { formattedElapsed, formattedMax } = useSessionTimer(session)
 
   const rawRoomName = session?.name || session?.roomName || "General"
-  const translatedName = React.useMemo(() => {
-    return getTranslatedRoomName(rawRoomName, t)
-  }, [rawRoomName, t?.rooms?.specialNames])
 
   const isSidePanelOpen = showChat || showParticipants
   const sidePanelTitle = showParticipants
@@ -128,7 +124,7 @@ const VideoCallRoomContent = () => {
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <div className="text-base font-semibold">{translatedName}</div>
+              <div className="text-base font-semibold">{rawRoomName}</div>
               {room?.requiredLevel && (
                 <span className="rounded-full bg-[#990011] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                   {room.requiredLevel}
