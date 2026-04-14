@@ -24,7 +24,7 @@ export const useQueueSignaling = (handlers = {}) => {
       return
     }
 
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "https://stagingapi.catspeak.com.vn/api"
+    const apiUrl = import.meta.env.VITE_API_BASE_URL
     const baseUrl = apiUrl.replace(/\/api\/?$/, "")
     const hubUrl = `${baseUrl}/hubs/queue`
 
