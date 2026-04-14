@@ -12,6 +12,7 @@ import { ConnectionState, RoomEvent } from "livekit-client"
 
 import { useVideoCall } from "@/features/video-call/hooks/useVideoCall"
 import { useScreenShare } from "@/features/video-call/hooks/useScreenShare"
+import { useRecording } from "@/features/video-call/hooks/useRecording"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
@@ -58,6 +59,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   const videoCallState = useVideoCall(t)
   const screenShareState = useScreenShare()
+  const recordingState = useRecording(sessionId ?? null)
 
   // Audio is handled by <RoomAudioRenderer /> in the JSX below.
 
@@ -217,6 +219,10 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     isLocalScreenShare: screenShareState.isLocalScreenShare,
     presenterDisplayName: screenShareState.presenterDisplayName,
     handleToggleScreenShare: actions.handleToggleScreenShare,
+    // Recording
+    isRecording: recordingState.isRecording,
+    isTogglingRecording: recordingState.isTogglingRecording,
+    handleToggleRecording: recordingState.handleToggleRecording,
   }
 
   return (

@@ -235,6 +235,7 @@ export const baseApi = createApi({
     "Messages",
     "Events",
     "Post",
+    "Recordings",
   ],
   endpoints: () => ({}),
 })
