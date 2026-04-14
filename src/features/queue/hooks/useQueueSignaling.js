@@ -24,7 +24,7 @@ export const useQueueSignaling = (handlers = {}) => {
       return
     }
 
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:7001/api"
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "https://stagingapi.catspeak.com.vn/api"
     const baseUrl = apiUrl.replace(/\/api\/?$/, "")
     const hubUrl = `${baseUrl}/hubs/queue`
 
@@ -40,12 +40,12 @@ export const useQueueSignaling = (handlers = {}) => {
 
     const safeHandler =
       (name) =>
-      (...args) => {
-        const handler = handlersRef.current[name]
-        if (handler) {
-          handler(...args)
+        (...args) => {
+          const handler = handlersRef.current[name]
+          if (handler) {
+            handler(...args)
+          }
         }
-      }
 
     // Bind Hub Events
     const events = [
@@ -103,7 +103,7 @@ export const useQueueSignaling = (handlers = {}) => {
 
     return () => {
       // console.log("[QueueSignalR] Stopping connection...")
-      newConnection.stop().catch(() => {})
+      newConnection.stop().catch(() => { })
       setIsConnected(false)
       setConnectionId(null)
       connectionRef.current = null
