@@ -87,7 +87,7 @@ export const ConversationSignalRProvider = ({ children }) => {
     const abortController = new AbortController()
     const { signal } = abortController
 
-    const apiUrl = import.meta.env.VITE_API_BASE_URL
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
     const baseUrl = apiUrl.replace(/\/api\/?$/, "")
     const hubUrl = `${baseUrl}/hubs/chat`
 
