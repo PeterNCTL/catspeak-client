@@ -33,6 +33,7 @@ export default {
   },
   filters: {
     title: "Phòng",
+    room: "phòng",
     totalSuffix: "phòng",
     breadcrumb: "Phòng",
     search: "Tìm kiếm",

@@ -32,6 +32,7 @@ export default {
   },
   filters: {
     title: "Rooms",
+    room: "room",
     totalSuffix: "rooms",
     breadcrumb: "Rooms",
     search: "Search",

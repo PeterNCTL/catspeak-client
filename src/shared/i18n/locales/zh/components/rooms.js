@@ -31,6 +31,7 @@ export default {
   },
   filters: {
     title: "房间",
+    room: "个房间",
     totalSuffix: "个房间",
     breadcrumb: "房间",
     search: "搜索",

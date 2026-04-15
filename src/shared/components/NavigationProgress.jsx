@@ -27,9 +27,14 @@ const NavigationProgress = () => {
     if (!apiState?.queries) return
 
     // Count how many queries are currently in a "pending" state
-    const pendingCount = Object.values(apiState.queries).filter(
-      (query) => query?.status === "pending"
-    ).length
+    const pendingCount = Object.values(apiState.queries).filter((query) => {
+      if (query?.status !== "pending") return false
+      // Ignore pagination requests for getRooms so they don't trigger global nprogress
+      if (query?.endpointName === "getRooms" && query?.originalArgs?.page > 1) {
+        return false
+      }
+      return true
+    }).length
 
     const wasFetching = activeCountRef.current > 0
     const isFetching = pendingCount > 0
