@@ -9,6 +9,8 @@ import {
   Mic,
   MicOff,
   Phone,
+  Circle,
+  Loader2,
 } from "lucide-react"
 import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 
@@ -25,7 +27,12 @@ const VideoCallControlBar = ({ unreadMessages }) => {
     handleToggleCam,
     handleToggleScreenShare,
     handleLeaveSession,
+    // Recording
+    isRecording,
+    isTogglingRecording,
+    handleToggleRecording,
   } = useVideoCallContext()
+
   // Common button styles
   const buttonBaseClass =
     "flex items-center justify-center rounded-full transition-colors shadow-sm w-12 h-12"
@@ -70,6 +77,42 @@ const VideoCallControlBar = ({ unreadMessages }) => {
       >
         {isLocalScreenShare ? <MonitorOff /> : <MonitorUp />}
       </button>
+
+      {/* ── Record Toggle ─────────────────────────────────────────────── */}
+      <div className="relative">
+        <button
+          onClick={handleToggleRecording}
+          disabled={isTogglingRecording}
+          title={isRecording ? "Stop recording" : "Start recording"}
+          className={`${buttonBaseClass} relative overflow-hidden transition-all ${
+            isTogglingRecording
+              ? "cursor-not-allowed opacity-70 bg-[#F2F2F2] text-gray-400"
+              : isRecording
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-[#F2F2F2] text-gray-600 hover:bg-[#D9D9D9] hover:text-gray-900"
+          }`}
+        >
+          {isTogglingRecording ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Circle
+              className={`h-5 w-5 ${isRecording ? "fill-white" : "fill-none"}`}
+            />
+          )}
+        </button>
+
+        {/* Pulse ring — visible only when actively recording */}
+        {isRecording && !isTogglingRecording && (
+          <span className="pointer-events-none absolute inset-0 rounded-full animate-ping bg-red-500 opacity-30" />
+        )}
+
+        {/* "REC" label under button */}
+        {isRecording && (
+          <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] font-bold tracking-widest text-red-600 whitespace-nowrap">
+            REC
+          </span>
+        )}
+      </div>
 
       {/* Participants Toggle */}
       <button
