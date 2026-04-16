@@ -58,6 +58,9 @@ export default {
     levels: {
       a1: "A1",
       b2: "B2",
+      beginner: "Người mới bắt đầu",
+      intermediate: "Trung cấp",
+      advanced: "Nâng cao",
     },
     categories: {
       random: "Kết nối ngẫu hứng",

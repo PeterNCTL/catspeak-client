@@ -17,7 +17,20 @@ const LevelFilter = () => {
     vi: "Vietnamese",
   }
   const currentLanguage = lang ? langMap[lang] : "English"
-  const currentLevels = LEVELS[currentLanguage] || LEVELS.English
+  const baseLevels = LEVELS[currentLanguage] || LEVELS.English
+
+  const additionalLevels = [
+    { label: t.rooms?.filters?.levels?.beginner || "Beginner", value: "Beginner" },
+    { label: t.rooms?.filters?.levels?.intermediate || "Intermediate", value: "Intermediate" },
+    { label: t.rooms?.filters?.levels?.advanced || "Advanced", value: "Advanced" },
+  ]
+
+  const currentLevels = [
+    ...baseLevels,
+    ...additionalLevels.filter(
+      (level) => !baseLevels.some((bl) => bl.value === level.value)
+    ),
+  ]
 
   const selectedCount = currentLevels.filter((levelObj) =>
     isSelected(levelObj.value),

@@ -57,6 +57,9 @@ export default {
     levels: {
       a1: "A1",
       b2: "B2",
+      beginner: "Beginner",
+      intermediate: "Intermediate",
+      advanced: "Advanced",
     },
     categories: {
       random: "Random Connection",

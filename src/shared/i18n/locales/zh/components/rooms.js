@@ -56,6 +56,9 @@ export default {
     levels: {
       a1: "A1",
       b2: "B2",
+      beginner: "初级",
+      intermediate: "中级",
+      advanced: "高级",
     },
     categories: {
       random: "随机连接",

@@ -16,6 +16,7 @@ const CategoryRoomSection = ({
   requiredLevels,
   topics,
   onSeeMore,
+  onTotalCountLoaded,
 }) => {
   const { t } = useLanguage()
   const itemsPerPage = useResponsiveItemsPerPage()
@@ -41,6 +42,15 @@ const CategoryRoomSection = ({
   const totalCount = additionalData.totalCount || 0
   const totalPages = additionalData.totalPages || 1
   const hasNextPage = additionalData.hasNextPage || false
+
+  // Report totalCount to parent for sorting
+  const lastReportedCount = useRef(null)
+  useEffect(() => {
+    if (onTotalCountLoaded && !isLoading && lastReportedCount.current !== totalCount) {
+      lastReportedCount.current = totalCount
+      onTotalCountLoaded(categoryKey, totalCount)
+    }
+  }, [totalCount, isLoading, onTotalCountLoaded, categoryKey])
 
   const [accumulatedRooms, setAccumulatedRooms] = useState([])
   const scrollContainerRef = useRef(null)
