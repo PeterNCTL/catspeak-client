@@ -96,18 +96,28 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
         let messageText = decoded
         let messageId = `sys-${Date.now()}-${Math.random()}`
         let timestamp = Date.now()
+        let isJson = false
 
         try {
           const json = JSON.parse(decoded)
           // If it's a standard user chat message that `useChat` will naturally handle, ignore it here
           if (participant && topic === "lk-chat") return 
-          
-          messageText = json.message || decoded
+
+          isJson = true
+          if (json.message !== undefined && json.message !== null) {
+            messageText = json.message
+          } else {
+            // It's a JSON payload but has no 'message' field; skip displaying raw JSON
+            messageText = ""
+          }
           if (json.id) messageId = json.id
           if (json.timestamp) timestamp = json.timestamp
         } catch {
-          // string payload
+          // It's a string payload, we just use decoded
         }
+
+        // Do not display empty messages
+        if (!messageText || messageText.trim() === "") return
 
         const newSysMsg = {
           id: messageId,
