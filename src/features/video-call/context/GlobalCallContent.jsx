@@ -97,6 +97,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
         let messageId = `sys-${Date.now()}-${Math.random()}`
         let timestamp = Date.now()
         let isJson = false
+        let translatedMessage = null
 
         try {
           const json = JSON.parse(decoded)
@@ -112,6 +113,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
           }
           if (json.id) messageId = json.id
           if (json.timestamp) timestamp = json.timestamp
+          if (json.translatedMessage) translatedMessage = json.translatedMessage
         } catch {
           // It's a string payload, we just use decoded
         }
@@ -123,6 +125,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
           id: messageId,
           timestamp,
           message: messageText,
+          translatedMessage,
           from: { name: "System", isSystem: true }
         }
 
