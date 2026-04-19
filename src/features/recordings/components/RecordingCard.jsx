@@ -28,6 +28,8 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
     createdAt,
   } = recording
 
+  console.log(recording)
+
   const isCompleted = status === "completed"
   const isFailed = status === "failed"
   const hasFile = isCompleted && fileUrl
@@ -104,45 +106,19 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
   }
 
   return (
-    <div className="group flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
+    <div className="group flex flex-col gap-3 rounded-lg border border-[#e5e5e5] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
       {/* Left: metadata */}
-      <div className="flex flex-1 flex-col gap-2 min-w-0">
-        {/* Top row: status badge + meeting ID */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Status badge */}
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-              isCompleted
-                ? "bg-emerald-50 text-emerald-700"
-                : isFailed
-                  ? "bg-red-50 text-red-700"
-                  : "bg-gray-100 text-gray-600"
-            }`}
-          >
-            <span
-              className={`inline-block h-1.5 w-1.5 rounded-full ${
-                isCompleted
-                  ? "bg-emerald-500"
-                  : isFailed
-                    ? "bg-red-500"
-                    : "bg-gray-400"
-              }`}
-            />
-            {isCompleted
-              ? t?.recordings?.status?.completed || "completed"
-              : isFailed
-                ? t?.recordings?.status?.failed || "failed"
-                : status}
-          </span>
-
-          {/* Meeting ID */}
-          <span className="text-xs text-gray-400 truncate" title={meetingId}>
-            {meetingId}
-          </span>
-        </div>
+      <div className="flex flex-col">
+        {/* Top row: meeting ID */}
+        <span
+          className="text-base text-red-900 font-semibold"
+          title={meetingId}
+        >
+          {meetingId}
+        </span>
 
         {/* Meta row: date, duration, size */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+        <div className="flex items-center gap-4 text-sm text-[#606060] flex-wrap">
           <span className="flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
             {formatDate(createdAt)}
@@ -180,13 +156,13 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
               ? t?.recordings?.actions?.play || "Play recording"
               : t?.recordings?.actions?.playUnavailable || "File not available"
           }
-          className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+          className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
             hasFile
-              ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
+              ? "bg-[#F2F2F2] hover:bg-[#D9D9D9]"
               : "bg-gray-50 text-gray-300 cursor-not-allowed"
           }`}
         >
-          <Play className="h-4 w-4" />
+          <Play className="h-5 w-5" />
         </button>
 
         {/* Download */}
@@ -199,22 +175,22 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
               : t?.recordings?.actions?.downloadUnavailable ||
                 "File not available"
           }
-          className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+          className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
             hasFile
-              ? "bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+              ? "bg-[#F2F2F2] hover:bg-[#D9D9D9]"
               : "bg-gray-50 text-gray-300 cursor-not-allowed"
           }`}
         >
-          <Download className="h-4 w-4" />
+          <Download className="h-5 w-5" />
         </button>
 
         {/* Delete */}
         <button
           onClick={() => onDelete?.(recording)}
           title={t?.recordings?.actions?.delete || "Delete recording"}
-          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F2F2F2] hover:bg-[#D9D9D9] transition-colors"
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-5 w-5" />
         </button>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { Video, RefreshCw, Loader2 } from "lucide-react"
 import { toast } from "react-hot-toast"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import {
@@ -12,6 +11,9 @@ import StorageBar from "../components/StorageBar"
 import RecordingCard from "../components/RecordingCard"
 import RecordingPlayer from "../components/RecordingPlayer"
 import DeleteRecordingModal from "../components/DeleteRecordingModal"
+import RecordingsEmptyState from "../components/RecordingsEmptyState"
+import RecordingsErrorState from "../components/RecordingsErrorState"
+import RecordingsListSkeleton from "../components/RecordingsListSkeleton"
 
 const RecordingsPage = () => {
   const { t } = useLanguage()
@@ -24,8 +26,6 @@ const RecordingsPage = () => {
     error: recordingsError,
     refetch: refetchRecordings,
   } = useGetMyRecordingsQuery()
-
-  console.log("🚀 ~ RecordingsPage ~ recordings:", recordings)
 
   const { data: storage, isLoading: isLoadingStorage } = useGetStorageQuery()
 
@@ -75,22 +75,9 @@ const RecordingsPage = () => {
   return (
     <div className="flex flex-col gap-5">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-red-900">
-          {t?.recordings?.title || "Recordings"}
-        </h1>
-        <button
-          onClick={refetchRecordings}
-          disabled={isFetchingRecordings}
-          title={t?.recordings?.refresh || "Refresh recordings"}
-          className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
-        >
-          <RefreshCw
-            className={`h-3.5 w-3.5 ${isFetchingRecordings ? "animate-spin" : ""}`}
-          />
-          {t?.recordings?.refresh || "Refresh"}
-        </button>
-      </div>
+      <h1 className="text-xl font-bold text-red-900">
+        {t?.recordings?.title || "Recordings"}
+      </h1>
 
       {/* Storage bar */}
       <StorageBar
@@ -106,12 +93,12 @@ const RecordingsPage = () => {
       {isLoadingRecordings ? (
         <RecordingsListSkeleton />
       ) : recordingsError ? (
-        <ErrorState onRetry={refetchRecordings} t={t} />
+        <RecordingsErrorState onRetry={refetchRecordings} t={t} />
       ) : recordings.length === 0 ? (
-        <EmptyState t={t} />
+        <RecordingsEmptyState t={t} />
       ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-gray-500">
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-[#606060]">
             {recordings.length === 1
               ? t?.recordings?.list?.count_one || "1 recording"
               : t?.recordings?.list?.count_other?.replace(
@@ -119,6 +106,7 @@ const RecordingsPage = () => {
                   recordings.length,
                 ) || `${recordings.length} recordings`}
           </p>
+
           {recordings.map((rec) => (
             <RecordingCard
               key={rec.recordingId}
@@ -151,65 +139,5 @@ const RecordingsPage = () => {
     </div>
   )
 }
-
-// ── Sub-components ──────────────────────────────────────────────────────
-
-const EmptyState = ({ t }) => (
-  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center shadow-sm">
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 mb-4">
-      <Video className="h-8 w-8 text-gray-400" />
-    </div>
-    <h2 className="mt-2 text-lg font-medium text-gray-900">
-      {t?.recordings?.list?.emptyTitle || "No recordings yet"}
-    </h2>
-    <p className="mt-2 text-sm text-gray-500 max-w-sm">
-      {t?.recordings?.list?.emptyDescription ||
-        "When you record your calls, they will appear here."}
-    </p>
-  </div>
-)
-
-const ErrorState = ({ onRetry, t }) => (
-  <div className="flex flex-col items-center justify-center rounded-xl border border-red-100 bg-red-50 p-10 text-center">
-    <p className="text-sm text-red-600 mb-3">
-      {t?.recordings?.list?.error || "Failed to load recordings."}
-    </p>
-    <button
-      onClick={onRetry}
-      className="flex items-center gap-1.5 rounded-lg bg-white border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
-    >
-      <RefreshCw className="h-3.5 w-3.5" />
-      {t?.recordings?.list?.retry || "Retry"}
-    </button>
-  </div>
-)
-
-const RecordingsListSkeleton = () => (
-  <div className="flex flex-col gap-3">
-    {[1, 2, 3].map((i) => (
-      <div
-        key={i}
-        className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div className="flex flex-1 flex-col gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="h-5 w-20 rounded-full bg-gray-200" />
-            <div className="h-4 w-32 rounded bg-gray-200" />
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="h-3.5 w-28 rounded bg-gray-200" />
-            <div className="h-3.5 w-14 rounded bg-gray-200" />
-            <div className="h-3.5 w-16 rounded bg-gray-200" />
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-lg bg-gray-200" />
-          <div className="h-9 w-9 rounded-lg bg-gray-200" />
-          <div className="h-9 w-9 rounded-lg bg-gray-200" />
-        </div>
-      </div>
-    ))}
-  </div>
-)
 
 export default RecordingsPage

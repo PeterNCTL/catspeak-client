@@ -5,6 +5,7 @@ export default {
     title: "存储空间",
     used: "{{used}} / {{limit}} MB",
     percentUsed: "已使用 {{percent}}%",
+    limit_used: "/ {{limit}} 已使用",
     quotaExceeded: "存储空间已满 — 请删除一些录音以释放空间",
   },
   list: {

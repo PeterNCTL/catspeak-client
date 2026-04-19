@@ -21,7 +21,9 @@ const RecordingPlayer = ({ open, onClose, recording, t }) => {
       if (parsed.host.includes("r2.cloudflarestorage.com")) {
         return `/r2${parsed.pathname}${parsed.search}`
       }
-    } catch { /* pass through */ }
+    } catch {
+      /* pass through */
+    }
     return url
   }
 
@@ -32,33 +34,43 @@ const RecordingPlayer = ({ open, onClose, recording, t }) => {
       open={open}
       onClose={onClose}
       title={t?.recordings?.player?.title || "Recording"}
-      className="max-w-3xl w-full p-0 overflow-hidden"
+      className="p-5 max-w-3xl min-[426px]:max-w-3xl max-[425px]:max-w-none max-[425px]:h-full max-[425px]:flex max-[425px]:flex-col w-full p-0"
     >
-      <div className="flex flex-col">
-        {/* Video player */}
-        <div className="relative w-full bg-black">
-          {fileUrl ? (
-            <video
-              src={videoSrc}
-              controls
-              autoPlay
-              playsInline
-              className="w-full max-h-[70vh] object-contain"
-              controlsList="nodownload"
-            >
-              Your browser does not support the video tag.
-            </video>
-          ) : (
-            <div className="flex h-64 items-center justify-center text-gray-400">
-              <p>{t?.recordings?.player?.videoNotAvailable || "Video file is not available."}</p>
-            </div>
-          )}
+      <div className="flex flex-col flex-1 h-full">
+        {/* Video player container */}
+        <div className="flex flex-col flex-1 bg-black overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#990011] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 max-[425px]:max-h-none">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {fileUrl ? (
+              <video
+                src={videoSrc}
+                controls
+                autoPlay
+                playsInline
+                className="w-full max-h-[70vh] max-[425px]:max-h-full object-contain"
+                controlsList="nodownload"
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div className="flex h-64 items-center justify-center text-gray-400">
+                <p>
+                  {t?.recordings?.player?.videoNotAvailable ||
+                    "Video file is not available."}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer info */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 bg-white px-5 py-3 w-full shrink-0">
           <span className="text-xs text-gray-500">
-            {meetingId || (t?.recordings?.player?.meetingIdFallback?.replace("{{id}}", recordingId) || `Recording #${recordingId}`)}
+            {meetingId ||
+              t?.recordings?.player?.meetingIdFallback?.replace(
+                "{{id}}",
+                recordingId,
+              ) ||
+              `Recording #${recordingId}`}
           </span>
           <span className="text-xs text-gray-400">
             {t?.recordings?.player?.urlExpiry || "URL expires in 60 min"}

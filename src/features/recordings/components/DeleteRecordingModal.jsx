@@ -1,6 +1,7 @@
 import React from "react"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import Modal from "@/shared/components/ui/Modal"
+import PillButton from "@/shared/components/ui/buttons/PillButton"
 
 /**
  * DeleteRecordingModal — confirmation dialog for deleting a recording.
@@ -14,57 +15,60 @@ const DeleteRecordingModal = ({ open, onClose, recording, onConfirm, isDeleting,
     : null
 
   return (
-    <Modal open={open} onClose={onClose} showCloseButton={false}>
-      <div className="flex flex-col items-center text-center gap-4">
-        {/* Warning icon */}
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-          <AlertTriangle className="h-7 w-7 text-red-500" />
+    <Modal
+      open={open}
+      onClose={onClose}
+      showCloseButton={false}
+      className="max-w-sm min-[426px]:max-w-md max-[425px]:max-w-none max-[425px]:h-full max-[425px]:flex max-[425px]:flex-col"
+    >
+      <div className="flex flex-col flex-1">
+        <div className="flex flex-col items-center justify-center flex-1 text-center gap-4 max-h-[60vh] overflow-y-auto -mx-5 px-5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#990011] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 max-[425px]:max-h-none">
+          {/* Warning icon */}
+          <div className="flex h-14 w-14 items-center justify-center shrink-0 rounded-full bg-red-50">
+            <AlertTriangle className="h-7 w-7 text-red-500" />
+          </div>
+
+          {/* Title */}
+          <h3 className="text-lg font-semibold text-gray-900">
+            {t?.recordings?.deleteModal?.title || "Delete Recording?"}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm text-gray-500 max-w-xs">
+            {t?.recordings?.deleteModal?.description || "This will permanently delete the recording"}
+            {recording.meetingId && (
+              <span className="font-medium text-gray-700">
+                {" "}{recording.meetingId}
+              </span>
+            )}
+            {fileSizeMb && (
+              <span className="text-gray-500">
+                {" "}({fileSizeMb} MB)
+              </span>
+            )}
+            . {t?.recordings?.deleteModal?.cannotUndo || "This action cannot be undone."}
+          </p>
         </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900">
-          {t?.recordings?.deleteModal?.title || "Delete Recording?"}
-        </h3>
-
-        {/* Description */}
-        <p className="text-sm text-gray-500 max-w-xs">
-          {t?.recordings?.deleteModal?.description || "This will permanently delete the recording"}
-          {recording.meetingId && (
-            <span className="font-medium text-gray-700">
-              {" "}{recording.meetingId}
-            </span>
-          )}
-          {fileSizeMb && (
-            <span className="text-gray-500">
-              {" "}({fileSizeMb} MB)
-            </span>
-          )}
-          . {t?.recordings?.deleteModal?.cannotUndo || "This action cannot be undone."}
-        </p>
-
         {/* Buttons */}
-        <div className="flex w-full gap-3 mt-2">
-          <button
+        <div className="mt-8 flex flex-wrap justify-center gap-2">
+          <PillButton
             onClick={onClose}
             disabled={isDeleting}
-            className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            variant="secondary"
+            className="h-10 flex-1 min-w-[120px]"
           >
             {t?.recordings?.deleteModal?.cancel || "Cancel"}
-          </button>
-          <button
+          </PillButton>
+          <PillButton
             onClick={() => onConfirm?.(recording.recordingId)}
             disabled={isDeleting}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+            loading={isDeleting}
+            loadingText={t?.recordings?.deleteModal?.deleting || "Deleting…"}
+            className="h-10 flex-1 min-w-[120px] !bg-red-600 hover:!bg-red-700 !text-white !border-red-600 border"
           >
-            {isDeleting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {t?.recordings?.deleteModal?.deleting || "Deleting…"}
-              </>
-            ) : (
-              t?.recordings?.deleteModal?.confirm || "Delete"
-            )}
-          </button>
+            {t?.recordings?.deleteModal?.confirm || "Delete"}
+          </PillButton>
         </div>
       </div>
     </Modal>

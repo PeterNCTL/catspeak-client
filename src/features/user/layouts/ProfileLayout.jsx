@@ -21,7 +21,7 @@ const ProfileLayout = () => {
         </div>
 
         {/* Content */}
-        <div className="mx-auto w-full max-w-[1040px] min-w-0 p-4 lg:p-5 flex-1">
+        <div className="mx-auto w-full max-w-[1040px] min-w-0 p-5 flex-1">
           <Outlet />
         </div>
       </main>

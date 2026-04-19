@@ -5,6 +5,7 @@ export default {
     title: "Storage",
     used: "{{used}} / {{limit}} MB",
     percentUsed: "{{percent}}% used",
+    limit_used: "of {{limit}} used",
     quotaExceeded: "Storage full — delete recordings to free space",
   },
   list: {

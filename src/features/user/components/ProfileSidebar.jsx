@@ -5,15 +5,15 @@ import { User, GraduationCap, Building2, Settings, Video } from "lucide-react"
 
 const ProfileSidebar = ({ onClose, variant = "vertical" }) => {
   const { t } = useLanguage()
-  
+
   const isHorizontal = variant === "horizontal"
 
   const getLinkClasses = ({ isActive }) => {
     if (isHorizontal) {
-      return `relative flex items-center justify-center gap-2 px-4 h-12 whitespace-nowrap transition-colors flex-1 min-w-fit ${
+      return `relative flex items-center justify-center gap-2 px-4 h-10 whitespace-nowrap transition-colors flex-1 min-w-fit ${
         isActive
-          ? "text-[#990011] border-b-2 border-[#990011] font-medium"
-          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium"
+          ? "text-[#990011] border-b-2 !border-b-[#990011] font-medium"
+          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-b-2 !border-b-transparent font-medium"
       }`
     }
 
@@ -61,7 +61,13 @@ const ProfileSidebar = ({ onClose, variant = "vertical" }) => {
   ].filter((item) => !item.isHidden)
 
   return (
-    <div className={isHorizontal ? "flex overflow-x-auto hide-scrollbar w-full divide-x divide-gray-100" : "flex flex-col h-full text-gray-800"}>
+    <div
+      className={
+        isHorizontal
+          ? "flex overflow-x-auto hide-scrollbar w-full divide-x divide-gray-100"
+          : "flex flex-col h-full text-gray-800"
+      }
+    >
       {menuItems.map((item) => (
         <NavLink
           key={item.path}

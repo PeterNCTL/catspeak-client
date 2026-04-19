@@ -1,8 +1,9 @@
 import React from "react"
-import { HardDrive, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 
 /**
  * StorageBar — displays the user's recording storage usage as a visual progress bar.
+ * Mimics Google Drive's storage UI.
  *
  * @param {{ usedMb: number, limitMb: number, usagePercent: number, isQuotaExceeded: boolean, isLoading: boolean }} props
  */
@@ -17,70 +18,69 @@ const StorageBar = ({
   // Clamp percentage to 0-100 for the bar width
   const clampedPercent = Math.min(Math.max(usagePercent, 0), 100)
 
-  // Color coding based on usage
-  const getBarColor = () => {
-    if (isQuotaExceeded || clampedPercent >= 90) return "bg-red-500"
-    if (clampedPercent >= 70) return "bg-amber-500"
-    return "bg-emerald-500"
+  // Format storage helper
+  const formatStorage = (mb) => {
+    if (mb >= 1000) {
+      const gb = mb / 1000
+      return `${gb % 1 === 0 ? gb : gb.toFixed(1)} GB`
+    }
+    return `${Math.round(mb)} MB`
   }
 
-  const getBarBgColor = () => {
-    if (isQuotaExceeded || clampedPercent >= 90) return "bg-red-50"
-    if (clampedPercent >= 70) return "bg-amber-50"
-    return "bg-gray-100"
-  }
+  const usedFormatted = formatStorage(usedMb)
+  const limitFormatted = formatStorage(limitMb)
 
-  const getTextColor = () => {
-    if (isQuotaExceeded || clampedPercent >= 90) return "text-red-700"
-    if (clampedPercent >= 70) return "text-amber-700"
-    return "text-gray-700"
-  }
+  // Mimic Drive's primary blue. If quota exceeded, use red.
+  const barColor = isQuotaExceeded ? "bg-red-500" : "bg-blue-500"
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm animate-pulse">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="h-5 w-5 rounded bg-gray-200" />
-          <div className="h-4 w-32 rounded bg-gray-200" />
+      <div className="w-full animate-pulse py-2">
+        <div className="flex items-baseline mb-3">
+          <div className="h-8 w-24 rounded bg-gray-200" />
+          <div className="h-4 w-20 rounded bg-gray-200 ml-2" />
         </div>
-        <div className="h-3 w-full rounded-full bg-gray-200" />
-        <div className="mt-2 h-3 w-24 rounded bg-gray-200" />
+        <div className="h-1.5 w-full bg-gray-100 rounded-full" />
+        <div className="mt-3 flex gap-4">
+          <div className="h-4 w-20 rounded bg-gray-200" />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          <HardDrive className="h-5 w-5 text-gray-500" />
-          <span className="text-sm font-semibold text-gray-800">
-            {t?.recordings?.storage?.title || "Storage"}
-          </span>
-        </div>
-        <span className={`text-sm font-medium ${getTextColor()}`}>
-          {t?.recordings?.storage?.used?.replace("{{used}}", usedMb.toFixed(1)).replace("{{limit}}", limitMb.toFixed(0)) || `${usedMb.toFixed(1)} / ${limitMb.toFixed(0)} MB`}
+    <div className="w-full py-2">
+      {/* Header text */}
+      <div className="flex items-baseline mb-2">
+        <span className="text-3xl text-gray-800">
+          {usedFormatted}
+        </span>
+        <span className="text-sm text-gray-500 ml-1.5">
+          {t?.recordings?.storage?.limit_used?.replace("{{limit}}", limitFormatted) || `of ${limitFormatted} used`}
         </span>
       </div>
 
       {/* Progress bar */}
-      <div className={`h-2.5 w-full rounded-full ${getBarBgColor()} overflow-hidden`}>
+      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden flex">
         <div
-          className={`h-full rounded-full transition-all duration-500 ease-out ${getBarColor()}`}
+          className={`h-full rounded-full transition-all duration-500 ease-out ${barColor}`}
           style={{ width: `${clampedPercent}%` }}
         />
       </div>
 
-      {/* Footer info */}
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-xs text-gray-500">
-          {t?.recordings?.storage?.percentUsed?.replace("{{percent}}", clampedPercent.toFixed(1)) || `${clampedPercent.toFixed(1)}% used`}
-        </span>
+      {/* Legend */}
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-4 text-xs font-medium text-gray-600">
+          <div className="flex items-center gap-2">
+            <div className={`w-2.5 h-2.5 rounded-full ${barColor}`} />
+            <span>{t?.recordings?.storage?.title || "Recordings"}</span>
+          </div>
+        </div>
+        
         {isQuotaExceeded && (
-          <div className="flex items-center gap-1.5 text-xs font-medium text-red-600">
+          <div className="flex items-center gap-1.5 text-xs text-red-600">
             <AlertTriangle className="h-3.5 w-3.5" />
-            <span>{t?.recordings?.storage?.quotaExceeded || "Storage full — delete recordings to free space"}</span>
+            <span>{t?.recordings?.storage?.quotaExceeded || "Storage full"}</span>
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ export default {
     title: "Dung lượng",
     used: "{{used}} / {{limit}} MB",
     percentUsed: "Đã dùng {{percent}}%",
+    limit_used: "trong số {{limit}} đã dùng",
     quotaExceeded: "Đã hết dung lượng — xoá bớt bản ghi để giải phóng không gian",
   },
   list: {
