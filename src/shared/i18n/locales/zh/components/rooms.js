@@ -165,6 +165,8 @@ export default {
     readyToJoin: "准备好加入了吗？",
     micOff: "麦克风关闭",
     joinNow: "立即加入",
+    copyLink: "复制链接",
+    linkCopied: "已复制！",
     joinedAs: "加入身份",
     noOneHere: "还没其他人在这里。",
     isHere: "在这里",
@@ -185,12 +187,10 @@ export default {
     cameraPermissionDenied: "摄像头访问被拒绝，请在设置中允许。",
   },
   videoCall: {
-    recording: {
-      stopTitle: "停止录制",
-      stopDescription: "录像将保存在 <strong>你的空间 (My Workspace)</strong>。",
-      continueBtn: "继续录制",
-      confirmBtn: "确认",
-    },
+    moreOptions: "更多选项",
+    copyLink: "复制会议链接",
+    linkCopied: "已复制！",
+    leaveCall: "离开房间",
     provider: {
       connecting: "正在连接...",
       failedToLoad: "无法加载会话",

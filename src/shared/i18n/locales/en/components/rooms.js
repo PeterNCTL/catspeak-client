@@ -193,6 +193,8 @@ export default {
     readyToJoin: "Ready to join?",
     micOff: "Mic Off",
     joinNow: "Join now",
+    copyLink: "Copy Link",
+    linkCopied: "Link copied!",
     joinedAs: "Joined as",
     noOneHere: "No one else is here yet.",
     isHere: "is here",
@@ -217,12 +219,10 @@ export default {
       "Camera access denied. Please allow it in settings.",
   },
   videoCall: {
-    recording: {
-      stopTitle: "Stop recording",
-      stopDescription: "The recording will be saved in <strong>My Workspace</strong>.",
-      continueBtn: "Continue recording",
-      confirmBtn: "Confirm",
-    },
+    moreOptions: "More options",
+    copyLink: "Copy meeting link",
+    linkCopied: "Link copied!",
+    leaveCall: "Leave call",
     provider: {
       connecting: "Getting your session ready...",
       failedToLoad: "Failed to load session",

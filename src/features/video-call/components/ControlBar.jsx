@@ -11,7 +11,11 @@ import {
   Phone,
   Circle,
   Loader2,
+  MoreVertical,
+  Copy,
 } from "lucide-react"
+import { toast } from "react-hot-toast"
+import { useLanguage } from "@/shared/context/LanguageContext"
 import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 import StopRecordingModal from "./StopRecordingModal"
 import { useLanguage } from "@/shared/context/LanguageContext"
@@ -39,6 +43,13 @@ const VideoCallControlBar = ({ unreadMessages }) => {
     cancelStopRecording,
   } = useVideoCallContext()
 
+  const [showMoreMenu, setShowMoreMenu] = React.useState(false)
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast.success(t?.rooms?.videoCall?.linkCopied || "Link copied!")
+    setShowMoreMenu(false)
+  }
   // Common button styles
   const buttonBaseClass =
     "flex items-center justify-center rounded-full transition-colors shadow-sm w-12 h-12"
@@ -65,7 +76,11 @@ const VideoCallControlBar = ({ unreadMessages }) => {
 
       <button
         onClick={handleToggleCam}
-        title={cameraOn ? t.rooms?.videoCall?.controls?.camOff || "Turn camera off" : t.rooms?.videoCall?.controls?.camOn || "Turn camera on"}
+        title={
+          cameraOn
+            ? t.rooms?.videoCall?.controls?.camOff || "Turn camera off"
+            : t.rooms?.videoCall?.controls?.camOn || "Turn camera on"
+        }
         className={`${buttonBaseClass} ${
           cameraOn ? activeErrorClass : inactiveClass
         }`}
@@ -76,7 +91,11 @@ const VideoCallControlBar = ({ unreadMessages }) => {
       {/* Screen Share Toggle */}
       <button
         onClick={handleToggleScreenShare}
-        title={isLocalScreenShare ? t.rooms?.videoCall?.controls?.shareOff || "Stop sharing" : t.rooms?.videoCall?.controls?.shareOn || "Share screen"}
+        title={
+          isLocalScreenShare
+            ? t.rooms?.videoCall?.controls?.shareOff || "Stop sharing"
+            : t.rooms?.videoCall?.controls?.shareOn || "Share screen"
+        }
         className={`${buttonBaseClass} ${
           isLocalScreenShare ? activeWarningClass : inactiveClass
         }`}
@@ -89,7 +108,11 @@ const VideoCallControlBar = ({ unreadMessages }) => {
         <button
           onClick={handleToggleRecording}
           disabled={isTogglingRecording}
-          title={isRecording ? t.rooms?.videoCall?.controls?.recordOff || "Stop recording" : t.rooms?.videoCall?.controls?.recordOn || "Start recording"}
+          title={
+            isRecording
+              ? t.rooms?.videoCall?.controls?.recordOff || "Stop recording"
+              : t.rooms?.videoCall?.controls?.recordOn || "Start recording"
+          }
           className={`${buttonBaseClass} relative overflow-hidden transition-all ${
             isTogglingRecording
               ? "cursor-not-allowed opacity-70 bg-[#F2F2F2] text-gray-400"
@@ -148,9 +171,43 @@ const VideoCallControlBar = ({ unreadMessages }) => {
         )}
       </div>
 
+      {/* More Toggle */}
+      <div className="relative">
+        <button
+          onClick={() => setShowMoreMenu(!showMoreMenu)}
+          title={t?.rooms?.videoCall?.moreOptions || "More options"}
+          className={`${buttonBaseClass} ${
+            showMoreMenu ? activeToggleClass : inactiveClass
+          }`}
+        >
+          <MoreVertical />
+        </button>
+
+        {showMoreMenu && (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setShowMoreMenu(false)}
+            />
+            <div className="absolute bottom-[110%] right-0 z-50 mb-2 w-56 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-black ring-opacity-5">
+              <button
+                onClick={handleCopyLink}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black transition-colors"
+                style={{ textAlign: "left" }}
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
+                  <Copy className="h-4 w-4" />
+                </span>
+                {t?.rooms?.videoCall?.copyLink || "Copy meeting link"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
       <button
         onClick={handleLeaveSession}
-        title={t.rooms?.videoCall?.controls?.leave || "Leave call"}
+        title={t?.rooms?.videoCall?.leaveCall || "Leave call"}
         className={`${buttonBaseClass} bg-[#d40018] text-white hover:bg-[#e7001a]`}
       >
         <Phone className="rotate-[135deg]" />
