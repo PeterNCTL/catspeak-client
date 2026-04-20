@@ -14,6 +14,7 @@ export default {
     catSpeak: "Cat Speak",
     cart: "Khóa học",
     connect: "Cá nhân",
+    workspace: "Nhà của bạn",
   },
   comingSoon: {
     badge: "Sắp ra mắt",
