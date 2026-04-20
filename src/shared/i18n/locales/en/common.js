@@ -14,6 +14,7 @@ export default {
     catSpeak: "Cat Speak",
     cart: "Courses",
     connect: "Profile",
+    workspace: "My Workspace",
   },
   comingSoon: {
     badge: "Coming Soon",

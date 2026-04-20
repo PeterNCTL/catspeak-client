@@ -14,6 +14,7 @@ export default {
     catSpeak: "猫语",
     cart: "课程",
     connect: "个人",
+    workspace: "我的工作区",
   },
   comingSoon: {
     badge: "即将推出",
