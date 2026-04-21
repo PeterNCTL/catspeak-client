@@ -48,6 +48,7 @@ export default {
   collapse: "Collapse",
   seeMore: "See more",
   event: "Event",
+  myEvents: "My Events",
   catSpeakEvent: "Cat Speak Event",
   calendar: "CALENDAR",
   offline: "OFFLINE",

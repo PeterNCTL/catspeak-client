@@ -15,11 +15,29 @@ const SharedEventPage = () => {
 
   // Smart redirect to the native event modal
   useEffect(() => {
-    const targetId = data?.event?.eventId || data?.event?.id
-    if (targetId) {
-      navigate(`/${language}/cat-speak/calendar?eventId=${targetId}`, {
-        replace: true,
-      })
+    if (data) {
+      if (data.shareLink && data.shareLink.isValid === false) {
+        return // Stay on page to show invalid link error
+      }
+
+      const targetId = data.eventId || data.event?.eventId || data.event?.id || data.shareLink?.eventId
+      const occurrenceId = data.occurrenceId
+
+      const hasTargetId = targetId !== undefined && targetId !== null
+      const hasOccurrenceId = occurrenceId !== undefined && occurrenceId !== null
+
+      if (hasTargetId || hasOccurrenceId) {
+        const params = new URLSearchParams()
+        params.append("eventId", hasTargetId ? targetId : occurrenceId)
+        
+        if (hasOccurrenceId && hasTargetId) {
+          params.append("occurrenceId", occurrenceId)
+        }
+        
+        navigate(`/${language}/cat-speak/calendar?${params.toString()}`, {
+          replace: true,
+        })
+      }
     }
   }, [data, language, navigate])
 
@@ -37,7 +55,9 @@ const SharedEventPage = () => {
     )
   }
 
-  if (isError || (!isLoading && !data)) {
+  const isInvalidLink = data?.shareLink && data.shareLink.isValid === false
+
+  if (isError || (!isLoading && (!data || isInvalidLink))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-slate-100 px-4">
         <div className="bg-white rounded-3xl shadow-xl p-10 max-w-md w-full text-center">

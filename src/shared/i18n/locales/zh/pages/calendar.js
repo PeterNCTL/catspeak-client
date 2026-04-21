@@ -48,6 +48,7 @@ export default {
   collapse: "收起",
   seeMore: "查看更多",
   event: "活动",
+  myEvents: "我的活动",
   catSpeakEvent: "Cat Speak 活动",
   calendar: "日历",
   offline: "线下",

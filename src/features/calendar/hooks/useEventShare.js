@@ -34,6 +34,7 @@ const useEventShare = (eventId) => {
           expiresAt: new Date(
             Date.now() + 7 * 24 * 60 * 60 * 1000,
           ).toISOString(),
+          maxUses: 0,
         }).unwrap()
         const token = res.token || (typeof res === "string" ? res.split("/").pop() : res.shareUrl?.split("/").pop())
         const url = `${window.location.origin}/events/shared/${token}`

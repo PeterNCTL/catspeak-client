@@ -126,7 +126,7 @@ const EventDetailModal = ({ event, onClose }) => {
         <div className="shrink-0 bg-white min-[426px]:rounded-b-xl">
           <EventDetailFooter
             eventId={eventId}
-            event={event}
+            event={ev}
             onClose={onClose}
             onEdit={() => {
               if (ev?.isRecurring) {

@@ -48,6 +48,7 @@ export default {
   collapse: "Thu gọn",
   seeMore: "Xem thêm",
   event: "Sự kiện",
+  myEvents: "Sự kiện của tôi",
   catSpeakEvent: "Sự kiện của Cat Speak",
   calendar: "LỊCH",
   offline: "OFFLINE",

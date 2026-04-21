@@ -85,6 +85,15 @@ export const eventsApi = baseApi.injectEndpoints({
       providesTags: ["Events"],
     }),
 
+    // GET /api/v1/events/mine
+    getMyEvents: builder.query({
+      query: (params) => ({
+        url: "/v1/events/mine",
+        params,
+      }),
+      providesTags: ["Events"],
+    }),
+
     // POST /api/v1/events/{eventId}/shared-links
     createSharedLink: builder.mutation({
       query: ({ eventId, ...body }) => ({
@@ -136,6 +145,7 @@ export const {
   useGetEventCountsQuery,
   useGetEventsByDateQuery,
   useGetRegisteredEventsQuery,
+  useGetMyEventsQuery,
   useCreateSharedLinkMutation,
   useGetSharedEventQuery,
   useRegisterForEventMutation,
