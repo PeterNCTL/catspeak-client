@@ -9,11 +9,13 @@ import {
   useCancelRegistrationMutation,
 } from "@/store/api/eventsApi"
 import Modal from "@/shared/components/ui/Modal"
+import ParticipantListModal from "./ParticipantListModal"
 
 const EventDetailFooter = ({ eventId, event, onClose, onEdit }) => {
   const { user, isAdmin } = useAuth()
   const { t } = useLanguage()
   const cal = t.calendar || {}
+  const [showParticipants, setShowParticipants] = useState(false)
 
   const isCreatorOrAdmin =
     isAdmin ||
@@ -109,25 +111,33 @@ const EventDetailFooter = ({ eventId, event, onClose, onEdit }) => {
     <>
       <div className="p-5 rounded-none min-[426px]:rounded-b-xl flex items-center justify-between gap-4 bg-white">
         {/* Register / Unregister */}
-        {!confirmDelete && (
-          <button
-            onClick={handleRegister}
-            disabled={isProcessing}
-            className={`flex-1 transition-colors text-base text-white font-bold h-10 rounded-lg ${
-              isProcessing
-                ? "bg-gray-400 cursor-not-allowed"
+        {!confirmDelete &&
+          (isCreatorOrAdmin ? (
+            <button
+              onClick={() => setShowParticipants(true)}
+              className="flex-1 transition-colors text-base text-white font-bold h-10 rounded-lg bg-[#B91264] hover:bg-[#990011]"
+            >
+              {cal.viewParticipants || "Xem danh sách người đăng ký"}
+            </button>
+          ) : (
+            <button
+              onClick={handleRegister}
+              disabled={isProcessing}
+              className={`flex-1 transition-colors text-base text-white font-bold h-10 rounded-lg ${
+                isProcessing
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : isRegistered
+                    ? "bg-cath-red-700 hover:bg-cath-red-800"
+                    : "bg-[#06AA3B] hover:bg-green-700"
+              }`}
+            >
+              {isProcessing
+                ? cal.processing || "Đang xử lý..."
                 : isRegistered
-                  ? "bg-cath-red-700 hover:bg-cath-red-800"
-                  : "bg-[#06AA3B] hover:bg-green-700"
-            }`}
-          >
-            {isProcessing
-              ? cal.processing || "Đang xử lý..."
-              : isRegistered
-                ? cal.cancelRegistration || "Hủy đăng kí"
-                : cal.register || "Đăng kí"}
-          </button>
-        )}
+                  ? cal.cancelRegistration || "Hủy đăng kí"
+                  : cal.register || "Đăng kí"}
+            </button>
+          ))}
 
         {/* Delete confirm / action icons */}
         {confirmDelete ? (
@@ -166,7 +176,10 @@ const EventDetailFooter = ({ eventId, event, onClose, onEdit }) => {
                 </button>
               </>
             )}
-            <SharePopover eventId={eventId} occurrenceId={event?.occurrenceId} />
+            <SharePopover
+              eventId={eventId}
+              occurrenceId={event?.occurrenceId}
+            />
           </div>
         )}
       </div>
@@ -218,6 +231,15 @@ const EventDetailFooter = ({ eventId, event, onClose, onEdit }) => {
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Participant List Modal */}
+      {showParticipants && (
+        <ParticipantListModal
+          open={showParticipants}
+          onClose={() => setShowParticipants(false)}
+          participants={event?.participants || []}
+        />
       )}
     </>
   )
