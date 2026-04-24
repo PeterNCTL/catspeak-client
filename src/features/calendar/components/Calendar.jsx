@@ -36,9 +36,6 @@ const Calendar = ({ currentDate = dayjs() }) => {
     return { day: dayValue, isCurrentMonth: true, originalDate: dayValue }
   })
 
-  console.log(currentDate.startOf("month").toISOString())
-  console.log(currentDate.endOf("month").toISOString())
-
   // Fetch event counts from the API for the current month
   const { data: eventCountsData } = useGetEventCountsQuery({
     startDate: currentDate.startOf("month").toISOString(),

@@ -73,8 +73,10 @@ const CalendarHeadline = ({ currentDate, onNextMonth, onPrevMonth }) => {
 
       <div className="w-full h-[1px] bg-[#E5E5E5] my-5" />
 
-      <RegisteredEvents />
-      <MyEvents />
+      <div className="space-y-5">
+        <RegisteredEvents />
+        <MyEvents />
+      </div>
     </div>
   )
 }

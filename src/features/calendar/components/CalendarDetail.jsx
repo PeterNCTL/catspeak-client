@@ -70,6 +70,7 @@ const CalendarDetail = ({ selectedDate, currentDate, onClose }) => {
           if (dayjs(ev.startTime).isSame(displayDate, "day")) {
             seenIds.add(id)
             allEvents.push({
+              ...ev,
               id,
               eventId: ev.eventId,
               occurrenceId: ev.occurrenceId,
