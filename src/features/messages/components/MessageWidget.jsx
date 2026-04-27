@@ -87,18 +87,16 @@ const MessageWidget = () => {
   const [sendMessageApi, { isLoading: isSending }] =
     useSendMessageMutation()
 
-  // Handle conversation selection
-  const handleSelectConversation = (conv) => {
-    dispatch(setActiveConversation(conv.conversationId))
-    // Clear unread badge for this conversation
-    dispatch(clearUnread(conv.conversationId))
+  // Clear unread logic
+  const clearUnreadLogic = (convId) => {
+    dispatch(clearUnread(convId))
     dispatch(
       conversationsApi.util.updateQueryData(
         "getConversations",
         undefined,
         (draft) => {
           const cachedConv = draft.find(
-            (c) => c.conversationId === conv.conversationId,
+            (c) => c.conversationId === convId,
           )
           if (cachedConv) {
             cachedConv.unreadCount = 0
@@ -107,6 +105,19 @@ const MessageWidget = () => {
       ),
     )
   }
+
+  // Handle conversation selection
+  const handleSelectConversation = (conv) => {
+    dispatch(setActiveConversation(conv.conversationId))
+    clearUnreadLogic(conv.conversationId)
+  }
+
+  // Handle programmatically opened conversations
+  useEffect(() => {
+    if (activeConversationId) {
+      clearUnreadLogic(activeConversationId)
+    }
+  }, [activeConversationId])
 
   // Handle back to list
   const handleBackToList = () => {

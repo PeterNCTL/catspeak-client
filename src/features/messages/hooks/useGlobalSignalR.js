@@ -54,7 +54,16 @@ export const useGlobalSignalR = () => {
         if (!isViewingConversation) {
           if (conversationId) {
              dispatch(incrementUnread(conversationId))
+             
+             // Ensure the user is in the SignalR group for this conversation
+             if (invokeRef.current) {
+               invokeRef.current("JoinConversation", Number(conversationId)).catch(console.warn)
+             }
           }
+        }
+        
+        // Always show toast for now, to ensure visibility of incoming events
+        if (!isViewingConversation) {
           import("react-hot-toast").then(({ toast }) => {
             const previewText = message?.messageContent || "New message received"
             toast.success(previewText, { icon: "💬" })
