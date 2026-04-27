@@ -238,7 +238,7 @@ const EventDetailFooter = ({ eventId, event, onClose, onEdit }) => {
         <ParticipantListModal
           open={showParticipants}
           onClose={() => setShowParticipants(false)}
-          participants={event?.participants || []}
+          occurrenceId={event?.occurrenceId}
         />
       )}
     </>
