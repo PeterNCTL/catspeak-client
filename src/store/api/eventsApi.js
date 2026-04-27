@@ -141,6 +141,15 @@ export const eventsApi = baseApi.injectEndpoints({
         "Events",
       ],
     }),
+
+    // GET /api/v1/Events/occurrence/{occurrenceId}/register
+    getOccurrenceRegistrations: builder.query({
+      query: (occurrenceId) => `/v1/Events/occurrence/${occurrenceId}/register`,
+      providesTags: (result, error, occurrenceId) => [
+        { type: "Events", id: `registrations-${occurrenceId}` },
+        "Events",
+      ],
+    }),
   }),
 })
 
@@ -159,4 +168,5 @@ export const {
   useGetSharedEventQuery,
   useRegisterForEventMutation,
   useCancelRegistrationMutation,
+  useGetOccurrenceRegistrationsQuery,
 } = eventsApi
