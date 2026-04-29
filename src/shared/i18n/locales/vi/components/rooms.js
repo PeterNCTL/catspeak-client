@@ -219,6 +219,13 @@ export default {
       participants: "Người tham gia",
       chat: "Trò chuyện",
     },
+    recording: {
+      stopTitle: "Dừng ghi hình",
+      stopDescription:
+        "Bản ghi sẽ được lưu tại <strong>Nhà của bạn (My Workspace)</strong>.",
+      continueBtn: "Tiếp tục ghi",
+      confirmBtn: "Xác nhận",
+    },
     provider: {
       connecting: "Đang kết nối...",
       failedToLoad: "Không thể tải phiên",

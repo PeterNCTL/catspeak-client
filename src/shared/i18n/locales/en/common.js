@@ -1,5 +1,6 @@
 export default {
   languageLabel: "English",
+  you: "You",
   switchTo: "Tiếng Việt",
   getStarted: "Get started",
   seeMore: "See more",

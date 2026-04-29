@@ -46,7 +46,7 @@ const LanguageSwitcher = ({ className = "" }) => {
       {/* Trigger */}
       <div
         onClick={handleToggle}
-        className="hover:bg-[#E5E5E5] rounded-lg h-10 flex items-center px-4 cursor-pointer"
+        className="hover:bg-[#E5E5E5] rounded-full h-10 flex items-center px-4 cursor-pointer"
       >
         <div className="flex items-center gap-3 text-sm font-bold text-[#FFB400] justify-between w-full">
           <span className="truncate">{getDisplayLabel()}</span>

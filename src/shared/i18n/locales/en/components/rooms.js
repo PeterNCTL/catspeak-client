@@ -229,6 +229,7 @@ export default {
     copyLink: "Copy meeting link",
     linkCopied: "Link copied!",
     leaveCall: "Leave call",
+<<<<<<< HEAD
     controls: {
       micOn: "Turn microphone on",
       micOff: "Turn microphone off",
@@ -240,6 +241,14 @@ export default {
       recordOff: "Stop recording",
       participants: "Participants",
       chat: "Chat",
+=======
+    recording: {
+      stopTitle: "Stop recording",
+      stopDescription:
+        "The recording will be saved in <strong>My Workspace</strong>.",
+      continueBtn: "Continue recording",
+      confirmBtn: "Confirm",
+>>>>>>> main
     },
     provider: {
       connecting: "Getting your session ready...",

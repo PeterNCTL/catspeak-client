@@ -1,5 +1,6 @@
 export default {
   languageLabel: "中文",
+  you: "你",
   switchTo: "Switch to English",
   getStarted: "开始使用",
   seeMore: "查看更多",

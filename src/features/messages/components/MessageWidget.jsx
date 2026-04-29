@@ -5,6 +5,9 @@ import AuthModalContext from "@/shared/context/AuthModalContext"
 import {
   useGetConversationsQuery,
   useGetConversationMessagesQuery,
+  useSendMessageMutation,
+  useMarkConversationAsReadMutation,
+  conversationsApi,
 } from "@/store/api/conversationsApi"
 import useMessageSignalR from "../hooks/useMessageSignalR"
 import useClickOutside from "@/shared/hooks/useClickOutside"
@@ -15,6 +18,10 @@ import {
   toggleWidget,
   setView,
 } from "@/store/slices/messageWidgetSlice"
+import {
+  selectTotalUnread,
+  clearUnread,
+} from "@/store/slices/notificationSlice"
 import { MessageCircle } from "lucide-react"
 import MessageModal from "./MessageModal"
 import ConversationListHeader from "./headers/ConversationListHeader"
@@ -30,23 +37,20 @@ const MessageWidget = () => {
     (state) => state.messageWidget,
   )
   const [input, setInput] = useState("")
-  const [unreadCount, setUnreadCount] = useState(0)
+  const totalUnreadCountRedux = useSelector(selectTotalUnread)
   const widgetRef = useRef(null)
 
-  // Clear unread count when widget opens
-  useEffect(() => {
-    if (isOpen) {
-      setUnreadCount(0)
-    }
-  }, [isOpen])
-
   // Handle click outside to close
-  useClickOutside(widgetRef, () => {
-    dispatch(closeWidget())
-  }, {
-    enabled: isOpen,
-    ignoreSelector: "[data-message-widget-portal]"
-  })
+  useClickOutside(
+    widgetRef,
+    () => {
+      dispatch(closeWidget())
+    },
+    {
+      enabled: isOpen,
+      ignoreSelector: "[data-message-widget-portal]",
+    },
+  )
 
   // Fetch conversations from API
   const {
@@ -54,6 +58,13 @@ const MessageWidget = () => {
     isLoading,
     isError,
   } = useGetConversationsQuery()
+
+  const totalUnreadCountServer = conversations.reduce(
+    (sum, c) => sum + (c.unreadCount || 0),
+    0,
+  )
+  // Use server total since it survives reload. Fallback to redux if empty (optional safety)
+  const totalUnreadCount = totalUnreadCountServer || totalUnreadCountRedux
 
   // Find active conversation object
   const selected = conversations.find(
@@ -72,13 +83,45 @@ const MessageWidget = () => {
   // -- SignalR Integration --
   const { sendSignalRMessage } = useMessageSignalR({
     activeConversationId,
-    onUnreadCountIncrement: () => setUnreadCount((prev) => prev + 1)
   })
+
+  const [sendMessageApi, { isLoading: isSending }] = useSendMessageMutation()
+  const [markConversationAsRead] = useMarkConversationAsReadMutation()
+
+  // Clear unread logic
+  const clearUnreadLogic = (convId) => {
+    dispatch(clearUnread(convId))
+    dispatch(
+      conversationsApi.util.updateQueryData(
+        "getConversations",
+        undefined,
+        (draft) => {
+          const cachedConv = draft.find((c) => c.conversationId === convId)
+          if (cachedConv) {
+            cachedConv.unreadCount = 0
+          }
+        },
+      ),
+    )
+
+    // Notify server to mark as read
+    markConversationAsRead(convId).catch((err) =>
+      console.error("Failed to mark conversation as read:", err),
+    )
+  }
 
   // Handle conversation selection
   const handleSelectConversation = (conv) => {
     dispatch(setActiveConversation(conv.conversationId))
+    clearUnreadLogic(conv.conversationId)
   }
+
+  // Handle programmatically opened conversations
+  useEffect(() => {
+    if (activeConversationId) {
+      clearUnreadLogic(activeConversationId)
+    }
+  }, [activeConversationId])
 
   // Handle back to list
   const handleBackToList = () => {
@@ -91,11 +134,13 @@ const MessageWidget = () => {
     if (!input.trim() || !activeConversationId) return
 
     try {
-      // Use SignalR to send
-      await sendSignalRMessage(activeConversationId, input, 0) // 0 = Text
+      await sendMessageApi({
+        conversationId: activeConversationId,
+        messageData: { messageContent: input, messageType: 0 },
+      }).unwrap()
       setInput("")
     } catch (error) {
-      console.error("Failed to send message via SignalR:", error)
+      console.error("Failed to send message:", error)
     }
   }
 
@@ -141,7 +186,7 @@ const MessageWidget = () => {
             onInputChange={(e) => setInput(e.target.value)}
             onSendMessage={handleSendMessage}
             onKeyPress={handleKeyPress}
-            isSending={false} // Removed mutation usage
+            isSending={isSending}
           />
         )}
       </MessageModal>
@@ -157,10 +202,10 @@ const MessageWidget = () => {
         className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-[#F2F2F2] hover:bg-[#D9D9D9] ${isOpen ? "" : ""}`}
         aria-label="Tin nhắn"
       >
-        <MessageCircle />
-        {unreadCount > 0 && (
+        <MessageCircle size={20} />
+        {totalUnreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] px-1 items-center justify-center rounded-full border-white bg-red-500 text-[10px] text-white shadow-sm dark:border-gray-800">
-            {unreadCount > 99 ? "99+" : unreadCount}
+            {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
           </span>
         )}
       </button>

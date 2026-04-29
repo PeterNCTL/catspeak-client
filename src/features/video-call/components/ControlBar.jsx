@@ -16,7 +16,6 @@ import {
 import { useGlobalVideoCall as useVideoCallContext } from "@/features/video-call/context/GlobalVideoCallProvider"
 import ControlBarMoreMenu from "./ControlBarMoreMenu"
 import StopRecordingModal from "./StopRecordingModal"
-import { useLanguage } from "@/shared/context/LanguageContext"
 
 const VideoCallControlBar = ({ unreadMessages }) => {
   const { t } = useLanguage()
