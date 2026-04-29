@@ -19,6 +19,8 @@ const TextInput = ({
   error,
   leftContent,
   leftContentWidthClass = "pl-14",
+  rightContent,
+  rightContentWidthClass = "!pr-12",
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -33,8 +35,9 @@ const TextInput = ({
 
   const errorClass = error ? "!border-red-500 focus:!ring-red-500 hover:!border-red-500" : ""
   const leftContentPadding = leftContent ? leftContentWidthClass : ""
+  const rightContentPadding = rightContent ? rightContentWidthClass : ""
 
-  const finalClassName = `h-10 w-full border border-[#C6C6C6] text-sm outline-none transition-colors focus:border-[var(--focus-color)] focus:ring-1 focus:ring-[var(--focus-color)] hover:border-[var(--focus-color)] placeholder-[var(--placeholder-color)] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden ${variantClasses} ${iconPadding} ${passwordPadding} ${errorClass} ${leftContentPadding} ${className}`
+  const finalClassName = `h-10 w-full border border-[#C6C6C6] text-sm outline-none transition-colors focus:border-[var(--focus-color)] focus:ring-1 focus:ring-[var(--focus-color)] hover:border-[var(--focus-color)] placeholder-[var(--placeholder-color)] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden ${variantClasses} ${iconPadding} ${passwordPadding} ${errorClass} ${leftContentPadding} ${rightContentPadding} ${className}`
 
   return (
     <div className={`flex flex-col gap-1 ${containerClassName}`}>
@@ -76,6 +79,11 @@ const TextInput = ({
           >
             {isPasswordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
+        )}
+        {rightContent && (
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 z-10 flex items-center">
+            {rightContent}
+          </div>
         )}
       </div>
       {showCount && props.maxLength && (

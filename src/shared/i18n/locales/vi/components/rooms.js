@@ -142,8 +142,8 @@ export default {
     showSystemMessages: "Hiển thị tin nhắn Cat Speak gợi ý",
     aiAssistant: "Trợ lý Cat Speak",
     aiEmptyText: "Nhập câu hỏi của bạn bên dưới để hỏi Trợ lý Cat Speak.",
-    publicAiPlaceholder: "Hỏi Cat Speak (Chế độ công khai)",
-    privateAiPlaceholder: "Hỏi Cat Speak (Chế độ riêng tư)",
+    publicAiPlaceholder: "Hỏi công khai",
+    privateAiPlaceholder: "Hỏi riêng tư",
     systemName: "Cat Speak gợi ý",
   },
   sessionActions: {

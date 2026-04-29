@@ -139,8 +139,8 @@ export default {
     showSystemMessages: "显示 Cat Speak 提示消息",
     aiAssistant: "Cat Speak 助手",
     aiEmptyText: "在下方输入您的问题以向 Cat Speak 提问。",
-    publicAiPlaceholder: "向 Cat Speak 提问（公开模式）",
-    privateAiPlaceholder: "向 Cat Speak 提问（私密模式）",
+    publicAiPlaceholder: "公开提问",
+    privateAiPlaceholder: "私密提问",
     systemName: "Cat Speak 提示",
   },
   sessionActions: {

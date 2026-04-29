@@ -167,8 +167,8 @@ export default {
     showSystemMessages: "Show Cat Speak suggestion messages",
     aiAssistant: "Cat Speak Assistant",
     aiEmptyText: "Type your question below to ask Cat Speak.",
-    publicAiPlaceholder: "Ask Cat Speak (Public mode)",
-    privateAiPlaceholder: "Ask Cat Speak (Private mode)",
+    publicAiPlaceholder: "Ask AI (Public)",
+    privateAiPlaceholder: "Ask AI (Private)",
     systemName: "Cat Speak Suggestion",
   },
   sessionActions: {

@@ -26,7 +26,7 @@ const ChatBox = ({
     receiveSystemMsgs,
     setReceiveSystemMsgs,
     aiMessages,
-    aiPromptStatus,
+    isCurrentUserPrompting,
   } = useGlobalVideoCall()
 
   const containerRef = useRef(null)
@@ -68,15 +68,17 @@ const ChatBox = ({
         />
       }
       content={
-        <div className="w-64 bg-white rounded-lg shadow-lg border border-[#E5E5E5] px-3 py-2 h-10 flex items-center justify-between">
-          <span className="text-sm">
+        <div className="w-64 bg-white rounded-lg shadow-lg border border-[#E5E5E5] p-3 min-h-[40px] flex items-center justify-between gap-3">
+          <span className="text-sm leading-tight text-left flex-1">
             {t.rooms?.chatBox?.showSystemMessages || "Show System Messages"}
           </span>
-          <Switch
-            checked={receiveSystemMsgs}
-            onChange={() => setReceiveSystemMsgs(!receiveSystemMsgs)}
-            colorClass="peer-checked:bg-green-500"
-          />
+          <div className="shrink-0">
+            <Switch
+              checked={receiveSystemMsgs}
+              onChange={() => setReceiveSystemMsgs(!receiveSystemMsgs)}
+              colorClass="peer-checked:bg-green-500"
+            />
+          </div>
         </div>
       }
     />
@@ -131,7 +133,6 @@ const ChatBox = ({
                   t.rooms?.chatBox?.aiEmptyText ||
                   "Ask the AI by typing @public-ai or @private-ai in the chat."
                 }
-                aiPromptStatus={aiPromptStatus}
               />
               <ChatInput
                 onSendMessage={onSendMessage}

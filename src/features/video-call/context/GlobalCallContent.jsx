@@ -95,7 +95,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   const systemMessages = useSystemMessages(lkRoom, receiveSystemMsgs)
 
-  const { aiMessages, addOptimisticAiMessage, aiPromptStatus, setAiPromptStatus } = useAiMessages(lkRoom, currentUserId, participants)
+  const { aiMessages, addOptimisticAiMessage, updateAiInteraction, isCurrentUserPrompting } = useAiMessages(lkRoom, currentUserId, participants)
   const [chatPublicAi] = useChatPublicAiMutation()
   const [chatPrivateAi] = useChatPrivateAiMutation()
 
@@ -171,8 +171,8 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     chatPrivateAi,
     receiveSystemMsgs,
     setReceiveSystemMsgs,
-    aiPromptStatus,
-    setAiPromptStatus,
+    updateAiInteraction,
+    isCurrentUserPrompting,
 
     // Actions
     handleToggleMic: actions.handleToggleMic,

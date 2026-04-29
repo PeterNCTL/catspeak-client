@@ -23,8 +23,8 @@ const ChatInput = ({
     currentUserId,
     lkRoomName,
     localParticipant,
-    aiPromptStatus,
-    setAiPromptStatus,
+    isCurrentUserPrompting,
+    updateAiInteraction,
   } = useGlobalVideoCall()
 
   const handleSend = useCallback(async () => {
@@ -35,7 +35,7 @@ const ChatInput = ({
     sendingRef.current = true
 
     if (isAiInput) {
-      if (aiPromptStatus?.active) {
+      if (isCurrentUserPrompting) {
         sendingRef.current = false
         return // Prevent prompting if already waiting for AI
       }
@@ -46,14 +46,17 @@ const ChatInput = ({
 
       const roomName = lkRoomName || "General"
 
-      setAiPromptStatus({ active: true, name: t?.rooms?.chatBox?.you || "You" })
+      const interactionId = `ai-opt-${Date.now()}`
 
       addOptimisticAiMessage({
-        id: `ai-opt-${Date.now()}`,
+        id: interactionId,
+        type: "interaction",
         timestamp: Date.now(),
-        message: formattedPrompt,
+        prompt: formattedPrompt,
         topic: isPublic ? "public-ai" : "private-ai",
         questioner: currentUserId,
+        response: null,
+        status: "loading",
         from: {
           name: t?.rooms?.chatBox?.you || "You",
           isLocal: true,
@@ -97,13 +100,10 @@ const ChatInput = ({
         }
       } catch (error) {
         console.error("AI chat error", error)
-        setAiPromptStatus({ active: false, name: "" })
-        addOptimisticAiMessage({
-          id: `ai-err-${Date.now()}`,
-          timestamp: Date.now(),
-          message: error?.data?.message || "All models are unavailable.",
-          topic: isPublic ? "public-ai" : "private-ai",
-          from: { name: "Cat Speak", isSystem: true, isAi: true },
+        updateAiInteraction(interactionId, {
+          status: "error",
+          response: error?.data?.message || "All models are unavailable.",
+          aiFrom: { name: "Cat Speak", isSystem: true, isAi: true },
         })
       }
       return
@@ -125,10 +125,10 @@ const ChatInput = ({
     currentUserId,
     t,
     onAiMessageSent,
-    aiPromptStatus,
+    isCurrentUserPrompting,
     lkRoomName,
     localParticipant,
-    setAiPromptStatus,
+    updateAiInteraction,
     isAiInput,
     isPrivateAi,
   ])
@@ -165,9 +165,9 @@ const ChatInput = ({
               ? isAiInput
                 ? isPrivateAi
                   ? t.rooms?.chatBox?.privateAiPlaceholder ||
-                    "Ask AI (Private mode)"
+                    "Ask AI (Private)"
                   : t.rooms?.chatBox?.publicAiPlaceholder ||
-                    "Ask AI (Public mode)"
+                    "Ask AI (Public)"
                 : t.rooms?.chatBox?.inputPlaceholder || "Type a message..."
               : t.rooms?.chatBox?.connectingPlaceholder || "Connecting..."
           }
@@ -188,19 +188,21 @@ const ChatInput = ({
             ) : undefined
           }
           leftContentWidthClass="!pl-[3.75rem]"
-        />
-        <button
-          type="submit"
-          disabled={!isConnected || !message.trim()}
-          className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors disabled:bg-black/10 disabled:text-black/25 disabled:cursor-not-allowed hover:opacity-90"
-          style={
-            isConnected && message.trim()
-              ? { backgroundColor: colors.red[700], color: "white" }
-              : {}
+          rightContent={
+            <button
+              type="submit"
+              disabled={!isConnected || !message.trim()}
+              className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 transition-colors disabled:bg-black/10 disabled:text-black/25 disabled:cursor-not-allowed hover:opacity-90"
+              style={
+                isConnected && message.trim()
+                  ? { backgroundColor: colors.red[700], color: "white" }
+                  : {}
+              }
+            >
+              <Send size={16} className="ml-[-1px] mt-[1px]" />
+            </button>
           }
-        >
-          <Send size={20} className="ml-[-2px] mt-[1px]" />
-        </button>
+        />
       </form>
     </div>
   )
