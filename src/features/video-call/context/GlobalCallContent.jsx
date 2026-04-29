@@ -17,6 +17,11 @@ import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
 import { useSystemMessages } from "@/features/video-call/hooks/useSystemMessages"
+import { useAiMessages } from "@/features/video-call/hooks/useAiMessages"
+import {
+  useChatPublicAiMutation,
+  useChatPrivateAiMutation,
+} from "@/store/api/conversationsApi"
 import {
   getNavigate,
   getLocation,
@@ -70,7 +75,29 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   const [receiveSystemMsgs, setReceiveSystemMsgs] = useState(true)
 
+  // ── Deduplicated participant list (local first) ──
+  const seenIdentities = new Set()
+  const participants = []
+
+  if (localParticipant) {
+    seenIdentities.add(localParticipant.identity)
+    participants.push(localParticipant)
+  }
+
+  allParticipants.forEach((p) => {
+    if (p.identity === localParticipant?.identity) return
+    if (seenIdentities.has(p.identity)) return
+    seenIdentities.add(p.identity)
+    participants.push(p)
+  })
+
+  const currentUserId = user?.accountId
+
   const systemMessages = useSystemMessages(lkRoom, receiveSystemMsgs)
+
+  const { aiMessages, addOptimisticAiMessage, aiPromptStatus, setAiPromptStatus } = useAiMessages(lkRoom, currentUserId, participants)
+  const [chatPublicAi] = useChatPublicAiMutation()
+  const [chatPrivateAi] = useChatPrivateAiMutation()
 
   const chatMessages = [...baseChatMessages, ...systemMessages].sort(
     (a, b) => a.timestamp - b.timestamp,
@@ -93,22 +120,6 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     setShowParticipants,
   })
 
-  // ── Deduplicated participant list (local first) ──
-  const seenIdentities = new Set()
-  const participants = []
-
-  if (localParticipant) {
-    seenIdentities.add(localParticipant.identity)
-    participants.push(localParticipant)
-  }
-
-  allParticipants.forEach((p) => {
-    if (p.identity === localParticipant?.identity) return
-    if (seenIdentities.has(p.identity)) return
-    seenIdentities.add(p.identity)
-    participants.push(p)
-  })
-
   // ── Context value ──
   const value = {
     // Call lifecycle
@@ -124,6 +135,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     location: getLocation(),
     session: sessionData,
     room: roomData,
+    lkRoomName: lkRoom?.name,
     sessionError: null,
 
     // User
@@ -138,6 +150,8 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     micOn: videoCallState.micOn,
     cameraOn: videoCallState.cameraOn,
     isConnected,
+    isTogglingMic: videoCallState.isTogglingMic,
+    isTogglingCam: videoCallState.isTogglingCam,
 
     // UI panels
     showChat,
@@ -147,8 +161,14 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
     // Chat
     messages: chatMessages,
+    aiMessages,
+    addOptimisticAiMessage,
+    chatPublicAi,
+    chatPrivateAi,
     receiveSystemMsgs,
     setReceiveSystemMsgs,
+    aiPromptStatus,
+    setAiPromptStatus,
 
     // Actions
     handleToggleMic: actions.handleToggleMic,
@@ -165,6 +185,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     isLocalScreenShare: screenShareState.isLocalScreenShare,
     presenterDisplayName: screenShareState.presenterDisplayName,
     handleToggleScreenShare: actions.handleToggleScreenShare,
+    isTogglingScreenShare: screenShareState.isTogglingScreenShare,
     // Recording
     isRecording: recordingState.isRecording,
     isTogglingRecording: recordingState.isTogglingRecording,

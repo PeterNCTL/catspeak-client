@@ -140,6 +140,8 @@ export default {
     inputPlaceholder: "Nhập gì đó...",
     connectingPlaceholder: "Đang kết nối...",
     showSystemMessages: "Hiển thị tin nhắn AI hệ thống",
+    aiAssistant: "Trợ lý AI",
+    aiEmptyText: "Hỏi AI bằng cách gõ @public-ai hoặc @private-ai trong khung chat.",
   },
   sessionActions: {
     connect11: "Kết nối 1:1",
@@ -202,6 +204,18 @@ export default {
     copyLink: "Sao chép liên kết phòng",
     linkCopied: "Đã sao chép!",
     leaveCall: "Rời phòng",
+    controls: {
+      micOn: "Bật micro",
+      micOff: "Tắt micro",
+      camOn: "Bật camera",
+      camOff: "Tắt camera",
+      shareOn: "Chia sẻ màn hình",
+      shareOff: "Dừng chia sẻ",
+      recordOn: "Bắt đầu ghi",
+      recordOff: "Dừng ghi",
+      participants: "Người tham gia",
+      chat: "Trò chuyện",
+    },
     provider: {
       connecting: "Đang kết nối...",
       failedToLoad: "Không thể tải phiên",

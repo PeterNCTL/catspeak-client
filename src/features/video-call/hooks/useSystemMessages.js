@@ -43,6 +43,11 @@ export const useSystemMessages = (lkRoom, receiveSystemMessages = true) => {
         }
       }
 
+      // Ignore AI messages, they are handled separately by useAiMessages
+      if (topic === "public-ai" || topic === "private-ai") {
+        return
+      }
+
       // We accept any packet without a source participant (likely server-sent API),
       // OR specifically packets on 'lk-chat'/'system' topics.
       if (!participant || topic === "lk-chat" || topic === "system") {

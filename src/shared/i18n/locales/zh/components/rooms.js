@@ -137,6 +137,8 @@ export default {
     inputPlaceholder: "输入内容...",
     connectingPlaceholder: "正在连接...",
     showSystemMessages: "显示 AI 系统消息",
+    aiAssistant: "AI 助手",
+    aiEmptyText: "在聊天中输入 @public-ai 或 @private-ai 来向 AI 提问。",
   },
   sessionActions: {
     connect11: "1:1 连接",
@@ -192,6 +194,18 @@ export default {
     copyLink: "复制会议链接",
     linkCopied: "已复制！",
     leaveCall: "离开房间",
+    controls: {
+      micOn: "开启麦克风",
+      micOff: "关闭麦克风",
+      camOn: "开启摄像头",
+      camOff: "关闭摄像头",
+      shareOn: "共享屏幕",
+      shareOff: "停止共享",
+      recordOn: "开始录制",
+      recordOff: "停止录制",
+      participants: "参与者",
+      chat: "聊天",
+    },
     provider: {
       connecting: "正在连接...",
       failedToLoad: "无法加载会话",

@@ -165,6 +165,8 @@ export default {
     inputPlaceholder: "Type Something...",
     connectingPlaceholder: "Connecting...",
     showSystemMessages: "Show AI system messages",
+    aiAssistant: "AI Assistant",
+    aiEmptyText: "Ask the AI by typing @public-ai or @private-ai in the chat.",
   },
   sessionActions: {
     connect11: "1:1 Connect",
@@ -224,6 +226,18 @@ export default {
     copyLink: "Copy meeting link",
     linkCopied: "Link copied!",
     leaveCall: "Leave call",
+    controls: {
+      micOn: "Turn microphone on",
+      micOff: "Turn microphone off",
+      camOn: "Turn camera on",
+      camOff: "Turn camera off",
+      shareOn: "Share screen",
+      shareOff: "Stop sharing",
+      recordOn: "Start recording",
+      recordOff: "Stop recording",
+      participants: "Participants",
+      chat: "Chat",
+    },
     provider: {
       connecting: "Getting your session ready...",
       failedToLoad: "Failed to load session",

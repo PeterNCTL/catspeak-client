@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import {
   useRoomContext,
   useLocalParticipant,
@@ -27,9 +27,17 @@ export const useScreenShare = () => {
   const isLocalScreenShare = isScreenShareEnabled
   const screenShareOn = screenShareTracks.length > 0
 
+  const [isTogglingScreenShare, setIsTogglingScreenShare] = useState(false)
+
   const toggleScreenShare = useCallback(async () => {
-    await room.localParticipant.setScreenShareEnabled(!isScreenShareEnabled)
-  }, [room, isScreenShareEnabled])
+    if (isTogglingScreenShare) return
+    setIsTogglingScreenShare(true)
+    try {
+      await room.localParticipant.setScreenShareEnabled(!isScreenShareEnabled)
+    } finally {
+      setIsTogglingScreenShare(false)
+    }
+  }, [room, isScreenShareEnabled, isTogglingScreenShare])
 
   return {
     screenShareOn,
@@ -37,6 +45,7 @@ export const useScreenShare = () => {
     screenShareTracks,   // Expose all tracks
     presenterId: presenter?.identity ?? null,
     isLocalScreenShare,
+    isTogglingScreenShare,
     toggleScreenShare,
     presenterDisplayName: presenter?.name ?? null,
   }

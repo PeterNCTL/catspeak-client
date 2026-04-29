@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import {
   useRoomContext,
   useLocalParticipant,
@@ -20,52 +20,67 @@ export const useVideoCall = (t) => {
 
   const isJoined = connectionState === ConnectionState.Connected
 
+  const [isTogglingMic, setIsTogglingMic] = useState(false)
+  const [isTogglingCam, setIsTogglingCam] = useState(false)
+
   // Toggle mic — probes getUserMedia first to surface permission errors cleanly.
   const toggleAudio = useCallback(async () => {
-    if (!isMicrophoneEnabled) {
-      let probe = null
-      try {
-        probe = await navigator.mediaDevices.getUserMedia({ audio: true })
-        const audioTrack = probe.getAudioTracks()[0]
+    if (isTogglingMic) return
+    setIsTogglingMic(true)
+    try {
+      if (!isMicrophoneEnabled) {
+        let probe = null
+        try {
+          probe = await navigator.mediaDevices.getUserMedia({ audio: true })
+          const audioTrack = probe.getAudioTracks()[0]
 
-        if (audioTrack?.muted) {
-          const unmuted = await new Promise((resolve) => {
-            const onUnmute = () => resolve(true)
-            audioTrack.addEventListener("unmute", onUnmute, { once: true })
-            setTimeout(() => {
-              audioTrack.removeEventListener("unmute", onUnmute)
-              resolve(false)
-            }, 2000)
-          })
-          if (!unmuted) {
-            toast.error(
-              t?.rooms?.waitingScreen?.micInUse ??
-                "Microphone is in use by another app.",
-            )
-            return
+          if (audioTrack?.muted) {
+            const unmuted = await new Promise((resolve) => {
+              const onUnmute = () => resolve(true)
+              audioTrack.addEventListener("unmute", onUnmute, { once: true })
+              setTimeout(() => {
+                audioTrack.removeEventListener("unmute", onUnmute)
+                resolve(false)
+              }, 2000)
+            })
+            if (!unmuted) {
+              toast.error(
+                t?.rooms?.waitingScreen?.micInUse ??
+                  "Microphone is in use by another app.",
+              )
+              return
+            }
           }
+        } finally {
+          probe?.getTracks().forEach((tr) => tr.stop())
         }
-      } finally {
-        probe?.getTracks().forEach((tr) => tr.stop())
       }
-    }
 
-    await room.localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
-  }, [room, isMicrophoneEnabled, t])
+      await room.localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
+    } finally {
+      setIsTogglingMic(false)
+    }
+  }, [room, isMicrophoneEnabled, t, isTogglingMic])
 
   // Toggle webcam — probes getUserMedia first to surface permission errors.
   const toggleVideo = useCallback(async () => {
-    if (!isCameraEnabled) {
-      let probe = null
-      try {
-        probe = await navigator.mediaDevices.getUserMedia({ video: true })
-      } finally {
-        probe?.getTracks().forEach((tr) => tr.stop())
+    if (isTogglingCam) return
+    setIsTogglingCam(true)
+    try {
+      if (!isCameraEnabled) {
+        let probe = null
+        try {
+          probe = await navigator.mediaDevices.getUserMedia({ video: true })
+        } finally {
+          probe?.getTracks().forEach((tr) => tr.stop())
+        }
       }
-    }
 
-    await room.localParticipant.setCameraEnabled(!isCameraEnabled)
-  }, [room, isCameraEnabled])
+      await room.localParticipant.setCameraEnabled(!isCameraEnabled)
+    } finally {
+      setIsTogglingCam(false)
+    }
+  }, [room, isCameraEnabled, isTogglingCam])
 
   const leaveMeeting = useCallback(async () => {
     await room.disconnect()
@@ -74,6 +89,8 @@ export const useVideoCall = (t) => {
   return {
     micOn: isMicrophoneEnabled ?? false,
     cameraOn: isCameraEnabled ?? false,
+    isTogglingMic,
+    isTogglingCam,
     toggleAudio,
     toggleVideo,
     leaveMeeting,
