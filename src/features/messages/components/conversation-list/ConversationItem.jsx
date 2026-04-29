@@ -24,7 +24,7 @@ const ConversationItem = ({ conversation, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center justify-between px-3 py-2 hover:bg-[#F2F2F2]"
+      className="flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-[#F2F2F2]"
     >
       <div className="flex items-center gap-3">
         <Avatar size={40} src={avatarSrc} name={username} alt={username} />
@@ -33,7 +33,7 @@ const ConversationItem = ({ conversation, onClick }) => {
           <span className="text-sm truncate max-w-[200px] text-[#606060]">
             {conversation?.lastMessage ? (
               <>
-                {isYou && <span className="font-medium">You: </span>}
+                {isYou && <span className="font-medium">{t.you || "You"}: </span>}
                 {conversation.lastMessage}
               </>
             ) : (

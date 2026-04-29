@@ -16,7 +16,7 @@ const MessageBubble = ({ message, isMyMessage }) => {
       className={`flex ${isMyMessage ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`max-w-[70%] rounded-2xl px-3 py-2 text-base ${
+        className={`max-w-[70%] rounded-2xl px-3 py-2 text-sm ${
           isMyMessage
             ? "bg-[#990011] text-white shadow"
             : "bg-gray-100 text-gray-800 shadow-inner"

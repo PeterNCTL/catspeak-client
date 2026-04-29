@@ -8,14 +8,14 @@ const ConversationListHeader = ({ onClose, isLoading }) => {
 
   return (
     <div className="border-b border-[#e5e5e5]">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             onClick={onClose}
-            className="flex min-[426px]:hidden h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+            className="flex min-[426px]:hidden h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
             aria-label={t.messages.close}
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft size={20} />
           </button>
           <h3 className="text-sm font-bold">{t.messages.title}</h3>
           {isLoading && (

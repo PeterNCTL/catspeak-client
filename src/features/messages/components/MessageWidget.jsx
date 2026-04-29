@@ -85,8 +85,7 @@ const MessageWidget = () => {
     activeConversationId,
   })
 
-  const [sendMessageApi, { isLoading: isSending }] =
-    useSendMessageMutation()
+  const [sendMessageApi, { isLoading: isSending }] = useSendMessageMutation()
   const [markConversationAsRead] = useMarkConversationAsReadMutation()
 
   // Clear unread logic
@@ -97,9 +96,7 @@ const MessageWidget = () => {
         "getConversations",
         undefined,
         (draft) => {
-          const cachedConv = draft.find(
-            (c) => c.conversationId === convId,
-          )
+          const cachedConv = draft.find((c) => c.conversationId === convId)
           if (cachedConv) {
             cachedConv.unreadCount = 0
           }
@@ -109,7 +106,7 @@ const MessageWidget = () => {
 
     // Notify server to mark as read
     markConversationAsRead(convId).catch((err) =>
-      console.error("Failed to mark conversation as read:", err)
+      console.error("Failed to mark conversation as read:", err),
     )
   }
 
@@ -205,7 +202,7 @@ const MessageWidget = () => {
         className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-[#F2F2F2] hover:bg-[#D9D9D9] ${isOpen ? "" : ""}`}
         aria-label="Tin nhắn"
       >
-        <MessageCircle />
+        <MessageCircle size={20} />
         {totalUnreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] px-1 items-center justify-center rounded-full border-white bg-red-500 text-[10px] text-white shadow-sm dark:border-gray-800">
             {totalUnreadCount > 99 ? "99+" : totalUnreadCount}

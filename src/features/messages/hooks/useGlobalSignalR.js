@@ -62,13 +62,7 @@ export const useGlobalSignalR = () => {
           }
         }
         
-        // Always show toast for now, to ensure visibility of incoming events
-        if (!isViewingConversation) {
-          import("react-hot-toast").then(({ toast }) => {
-            const previewText = message?.messageContent || "New message received"
-            toast.success(previewText, { icon: "💬" })
-          })
-        }
+
       },
 
       ChatUpdated: () => {
@@ -117,9 +111,7 @@ export const useGlobalSignalR = () => {
       setTimeout(() => reconnectRef.current(), 500)
     }
 
-    import("react-hot-toast").then(({ toast }) => {
-      toast.success("New conversation started!", { icon: "👋" })
-    })
+
   }, [dispatch])
 
   // Attach to handlers object
