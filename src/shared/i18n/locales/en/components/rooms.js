@@ -164,11 +164,17 @@ export default {
     you: "You",
     inputPlaceholder: "Type Something...",
     connectingPlaceholder: "Connecting...",
+    showSystemMessages: "Show Cat Speak suggestion messages",
+    aiAssistant: "Cat Speak Assistant",
+    aiEmptyText: "Type your question below to ask Cat Speak.",
+    publicAiPlaceholder: "Ask AI (Public)",
+    privateAiPlaceholder: "Ask AI (Private)",
+    systemName: "Cat Speak Suggestion",
   },
   sessionActions: {
     connect11: "1:1 Connect",
     connect25: "2:5 Connect",
-    yourAI: "Your AI",
+    yourAI: "Your Cat Speak",
   },
   queue: {
     title: "Find a Match",
@@ -223,6 +229,18 @@ export default {
     copyLink: "Copy meeting link",
     linkCopied: "Link copied!",
     leaveCall: "Leave call",
+    controls: {
+      micOn: "Turn microphone on",
+      micOff: "Turn microphone off",
+      camOn: "Turn camera on",
+      camOff: "Turn camera off",
+      shareOn: "Share screen",
+      shareOff: "Stop sharing",
+      recordOn: "Start recording",
+      recordOff: "Stop recording",
+      participants: "Participants",
+      chat: "Chat",
+    },
     recording: {
       stopTitle: "Stop recording",
       stopDescription:

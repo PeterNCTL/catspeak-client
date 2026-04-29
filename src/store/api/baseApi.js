@@ -80,8 +80,10 @@ async function ensureRefresh(api, extraOptions, reason) {
     stateHasRefresh: !!api.getState().auth.refreshToken,
     lsHasToken: !!localStorage.getItem("token"),
     lsHasRefresh: !!localStorage.getItem("refreshToken"),
-    stateAndLsTokenMatch: api.getState().auth.token === localStorage.getItem("token"),
-    stateAndLsRefreshMatch: api.getState().auth.refreshToken === localStorage.getItem("refreshToken"),
+    stateAndLsTokenMatch:
+      api.getState().auth.token === localStorage.getItem("token"),
+    stateAndLsRefreshMatch:
+      api.getState().auth.refreshToken === localStorage.getItem("refreshToken"),
   })
 
   refreshPromise = (async () => {
@@ -237,6 +239,7 @@ export const baseApi = createApi({
     "Post",
     "Recordings",
     "Storage",
+    "InstructorProfile",
   ],
   endpoints: () => ({}),
 })

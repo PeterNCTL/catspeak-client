@@ -16,6 +16,12 @@ import { useRecording } from "@/features/video-call/hooks/useRecording"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
+import { useSystemMessages } from "@/features/video-call/hooks/useSystemMessages"
+import { useAiMessages } from "@/features/video-call/hooks/useAiMessages"
+import {
+  useChatPublicAiMutation,
+  useChatPrivateAiMutation,
+} from "@/store/api/conversationsApi"
 import {
   getNavigate,
   getLocation,
@@ -67,79 +73,37 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
   const baseChatMessages = chatState.chatMessages ?? []
   const chatSend = chatState.send ?? (() => {})
 
-  const [systemMessages, setSystemMessages] = useState([])
+  const [receiveSystemMsgs, setReceiveSystemMsgs] = useState(true)
 
-  useEffect(() => {
-    if (!lkRoom) {
-      console.warn(
-        "[LiveKit Debug] lkRoom is null, cannot attach DataReceived listener.",
-      )
-      return
-    }
+  // ── Deduplicated participant list (local first) ──
+  const seenIdentities = new Set()
+  const participants = []
 
-    console.log(
-      `[LiveKit Debug] DataReceived listener actively attached to room: ${lkRoom.name || "Unknown"}`,
-    )
+  if (localParticipant) {
+    seenIdentities.add(localParticipant.identity)
+    participants.push(localParticipant)
+  }
 
-    const handleData = (payload, participant, kind, topic) => {
-      const decoded = new TextDecoder().decode(payload)
-      console.log(
-        `[LiveKit Debug] Packet Received! Topic:`,
-        topic,
-        `| Participant:`,
-        participant?.identity,
-        `| Content:`,
-        decoded,
-      )
+  allParticipants.forEach((p) => {
+    if (p.identity === localParticipant?.identity) return
+    if (seenIdentities.has(p.identity)) return
+    seenIdentities.add(p.identity)
+    participants.push(p)
+  })
 
-      if (!participant) {
-        console.log("🚀 [BACKEND PAYLOAD RECEIVED] Topic:", topic)
-        console.log("Raw decoded:", decoded)
-        try {
-          const parsed = JSON.parse(decoded)
-          console.log("Parsed JSON:", parsed)
-        } catch (e) {
-          // Not a JSON payload, ignore
-        }
-      }
+  const currentUserId = user?.accountId
 
-      // We accept any packet without a source participant (likely server-sent API),
-      // OR specifically packets on 'lk-chat'/'system' topics.
-      if (!participant || topic === "lk-chat" || topic === "system") {
-        let messageText = decoded
-        let messageId = `sys-${Date.now()}-${Math.random()}`
-        let timestamp = Date.now()
+  const systemMessages = useSystemMessages(lkRoom, receiveSystemMsgs)
 
-        try {
-          const json = JSON.parse(decoded)
-          // If it's a standard user chat message that `useChat` will naturally handle, ignore it here
-          if (participant && topic === "lk-chat") return
+  const { aiMessages, addOptimisticAiMessage, updateAiInteraction, isCurrentUserPrompting } = useAiMessages(lkRoom, currentUserId, participants)
+  const [chatPublicAi] = useChatPublicAiMutation()
+  const [chatPrivateAi] = useChatPrivateAiMutation()
 
-          messageText = json.message || decoded
-          if (json.id) messageId = json.id
-          if (json.timestamp) timestamp = json.timestamp
-        } catch {
-          // string payload
-        }
+  const chatMessages = [...baseChatMessages].sort(
+    (a, b) => a.timestamp - b.timestamp,
+  )
 
-        const newSysMsg = {
-          id: messageId,
-          timestamp,
-          message: messageText,
-          from: { name: "System", isSystem: true },
-        }
-
-        setSystemMessages((prev) => [...prev, newSysMsg])
-      }
-    }
-
-    lkRoom.on(RoomEvent.DataReceived, handleData)
-    return () => {
-      lkRoom.off(RoomEvent.DataReceived, handleData)
-    }
-  }, [lkRoom])
-
-  const chatMessages = [...baseChatMessages, ...systemMessages].sort(
+  const combinedAiMessages = [...aiMessages, ...systemMessages].sort(
     (a, b) => a.timestamp - b.timestamp,
   )
 
@@ -160,22 +124,6 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     setShowParticipants,
   })
 
-  // ── Deduplicated participant list (local first) ──
-  const seenIdentities = new Set()
-  const participants = []
-
-  if (localParticipant) {
-    seenIdentities.add(localParticipant.identity)
-    participants.push(localParticipant)
-  }
-
-  allParticipants.forEach((p) => {
-    if (p.identity === localParticipant?.identity) return
-    if (seenIdentities.has(p.identity)) return
-    seenIdentities.add(p.identity)
-    participants.push(p)
-  })
-
   // ── Context value ──
   const value = {
     // Call lifecycle
@@ -191,6 +139,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     location: getLocation(),
     session: sessionData,
     room: roomData,
+    lkRoomName: lkRoom?.name,
     sessionError: null,
 
     // User
@@ -205,6 +154,8 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     micOn: videoCallState.micOn,
     cameraOn: videoCallState.cameraOn,
     isConnected,
+    isTogglingMic: videoCallState.isTogglingMic,
+    isTogglingCam: videoCallState.isTogglingCam,
 
     // UI panels
     showChat,
@@ -214,6 +165,14 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
     // Chat
     messages: chatMessages,
+    aiMessages: combinedAiMessages,
+    addOptimisticAiMessage,
+    chatPublicAi,
+    chatPrivateAi,
+    receiveSystemMsgs,
+    setReceiveSystemMsgs,
+    updateAiInteraction,
+    isCurrentUserPrompting,
 
     // Actions
     handleToggleMic: actions.handleToggleMic,
@@ -230,6 +189,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     isLocalScreenShare: screenShareState.isLocalScreenShare,
     presenterDisplayName: screenShareState.presenterDisplayName,
     handleToggleScreenShare: actions.handleToggleScreenShare,
+    isTogglingScreenShare: screenShareState.isTogglingScreenShare,
     // Recording
     isRecording: recordingState.isRecording,
     isTogglingRecording: recordingState.isTogglingRecording,

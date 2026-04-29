@@ -31,13 +31,21 @@ const IDLE_VALUE = {
   returnToCall: () => {},
   participants: [],
   messages: [],
+  aiMessages: [],
+  addOptimisticAiMessage: () => {},
+  chatPublicAi: async () => {},
+  chatPrivateAi: async () => {},
   isConnected: false,
   micOn: false,
   cameraOn: false,
+  isTogglingMic: false,
+  isTogglingCam: false,
+  isTogglingScreenShare: false,
   showChat: false,
   setShowChat: () => {},
   showParticipants: false,
   setShowParticipants: () => {},
+  lkRoomName: null,
 }
 
 const IdleCallContent = ({ children }) => (

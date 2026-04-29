@@ -139,11 +139,17 @@ export default {
     you: "Bạn",
     inputPlaceholder: "Nhập gì đó...",
     connectingPlaceholder: "Đang kết nối...",
+    showSystemMessages: "Hiển thị tin nhắn Cat Speak gợi ý",
+    aiAssistant: "Trợ lý Cat Speak",
+    aiEmptyText: "Nhập câu hỏi của bạn bên dưới để hỏi Trợ lý Cat Speak.",
+    publicAiPlaceholder: "Hỏi công khai",
+    privateAiPlaceholder: "Hỏi riêng tư",
+    systemName: "Cat Speak gợi ý",
   },
   sessionActions: {
     connect11: "Kết nối 1:1",
     connect25: "Kết nối 2:5",
-    yourAI: "AI của bạn",
+    yourAI: "Cat Speak của bạn",
   },
   queue: {
     title: "Tìm đối tác",
@@ -201,6 +207,18 @@ export default {
     copyLink: "Sao chép liên kết phòng",
     linkCopied: "Đã sao chép!",
     leaveCall: "Rời phòng",
+    controls: {
+      micOn: "Bật micro",
+      micOff: "Tắt micro",
+      camOn: "Bật camera",
+      camOff: "Tắt camera",
+      shareOn: "Chia sẻ màn hình",
+      shareOff: "Dừng chia sẻ",
+      recordOn: "Bắt đầu ghi",
+      recordOff: "Dừng ghi",
+      participants: "Người tham gia",
+      chat: "Trò chuyện",
+    },
     recording: {
       stopTitle: "Dừng ghi hình",
       stopDescription:
