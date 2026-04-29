@@ -12,6 +12,7 @@ import { ConnectionState, RoomEvent } from "livekit-client"
 
 import { useVideoCall } from "@/features/video-call/hooks/useVideoCall"
 import { useScreenShare } from "@/features/video-call/hooks/useScreenShare"
+import { useRecording } from "@/features/video-call/hooks/useRecording"
 import { useLanguage } from "@/shared/context/LanguageContext"
 import { useCallCleanup } from "@/features/video-call/hooks/useCallCleanup"
 import { useCallActions } from "@/features/video-call/hooks/useCallActions"
@@ -58,6 +59,7 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
 
   const videoCallState = useVideoCall(t)
   const screenShareState = useScreenShare()
+  const recordingState = useRecording(lkRoom)
 
   // Audio is handled by <RoomAudioRenderer /> in the JSX below.
 
@@ -65,8 +67,80 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
   const baseChatMessages = chatState.chatMessages ?? []
   const chatSend = chatState.send ?? (() => {})
 
-  const chatMessages = [...baseChatMessages].sort(
-    (a, b) => a.timestamp - b.timestamp
+  const [systemMessages, setSystemMessages] = useState([])
+
+  useEffect(() => {
+    if (!lkRoom) {
+      console.warn(
+        "[LiveKit Debug] lkRoom is null, cannot attach DataReceived listener.",
+      )
+      return
+    }
+
+    console.log(
+      `[LiveKit Debug] DataReceived listener actively attached to room: ${lkRoom.name || "Unknown"}`,
+    )
+
+    const handleData = (payload, participant, kind, topic) => {
+      const decoded = new TextDecoder().decode(payload)
+      console.log(
+        `[LiveKit Debug] Packet Received! Topic:`,
+        topic,
+        `| Participant:`,
+        participant?.identity,
+        `| Content:`,
+        decoded,
+      )
+
+      if (!participant) {
+        console.log("🚀 [BACKEND PAYLOAD RECEIVED] Topic:", topic)
+        console.log("Raw decoded:", decoded)
+        try {
+          const parsed = JSON.parse(decoded)
+          console.log("Parsed JSON:", parsed)
+        } catch (e) {
+          // Not a JSON payload, ignore
+        }
+      }
+
+      // We accept any packet without a source participant (likely server-sent API),
+      // OR specifically packets on 'lk-chat'/'system' topics.
+      if (!participant || topic === "lk-chat" || topic === "system") {
+        let messageText = decoded
+        let messageId = `sys-${Date.now()}-${Math.random()}`
+        let timestamp = Date.now()
+
+        try {
+          const json = JSON.parse(decoded)
+          // If it's a standard user chat message that `useChat` will naturally handle, ignore it here
+          if (participant && topic === "lk-chat") return
+
+          messageText = json.message || decoded
+          if (json.id) messageId = json.id
+          if (json.timestamp) timestamp = json.timestamp
+        } catch {
+          // string payload
+        }
+
+        const newSysMsg = {
+          id: messageId,
+          timestamp,
+          message: messageText,
+          from: { name: "System", isSystem: true },
+        }
+
+        setSystemMessages((prev) => [...prev, newSysMsg])
+      }
+    }
+
+    lkRoom.on(RoomEvent.DataReceived, handleData)
+    return () => {
+      lkRoom.off(RoomEvent.DataReceived, handleData)
+    }
+  }, [lkRoom])
+
+  const chatMessages = [...baseChatMessages, ...systemMessages].sort(
+    (a, b) => a.timestamp - b.timestamp,
   )
 
   // ── Action handlers ──
@@ -156,6 +230,13 @@ const GlobalCallContent = ({ children, ContextProvider }) => {
     isLocalScreenShare: screenShareState.isLocalScreenShare,
     presenterDisplayName: screenShareState.presenterDisplayName,
     handleToggleScreenShare: actions.handleToggleScreenShare,
+    // Recording
+    isRecording: recordingState.isRecording,
+    isTogglingRecording: recordingState.isTogglingRecording,
+    handleToggleRecording: recordingState.handleToggleRecording,
+    showStopModal: recordingState.showStopModal,
+    confirmStopRecording: recordingState.confirmStopRecording,
+    cancelStopRecording: recordingState.cancelStopRecording,
   }
 
   return (

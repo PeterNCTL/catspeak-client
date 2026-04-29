@@ -201,6 +201,13 @@ export default {
     copyLink: "Sao chép liên kết phòng",
     linkCopied: "Đã sao chép!",
     leaveCall: "Rời phòng",
+    recording: {
+      stopTitle: "Dừng ghi hình",
+      stopDescription:
+        "Bản ghi sẽ được lưu tại <strong>Nhà của bạn (My Workspace)</strong>.",
+      continueBtn: "Tiếp tục ghi",
+      confirmBtn: "Xác nhận",
+    },
     provider: {
       connecting: "Đang kết nối...",
       failedToLoad: "Không thể tải phiên",

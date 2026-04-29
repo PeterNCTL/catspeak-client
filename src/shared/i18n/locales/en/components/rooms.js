@@ -223,6 +223,13 @@ export default {
     copyLink: "Copy meeting link",
     linkCopied: "Link copied!",
     leaveCall: "Leave call",
+    recording: {
+      stopTitle: "Stop recording",
+      stopDescription:
+        "The recording will be saved in <strong>My Workspace</strong>.",
+      continueBtn: "Continue recording",
+      confirmBtn: "Confirm",
+    },
     provider: {
       connecting: "Getting your session ready...",
       failedToLoad: "Failed to load session",
