@@ -142,6 +142,8 @@ export default {
     publicAiPlaceholder: "公开提问",
     privateAiPlaceholder: "私密提问",
     systemName: "Cat Speak 提示",
+    replyingTo: "回复",
+    reply: "回复",
   },
   sessionActions: {
     connect11: "1:1 连接",

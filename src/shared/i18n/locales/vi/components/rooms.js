@@ -145,6 +145,8 @@ export default {
     publicAiPlaceholder: "Hỏi công khai",
     privateAiPlaceholder: "Hỏi riêng tư",
     systemName: "Cat Speak gợi ý",
+    replyingTo: "Đang trả lời",
+    reply: "Trả lời",
   },
   sessionActions: {
     connect11: "Kết nối 1:1",

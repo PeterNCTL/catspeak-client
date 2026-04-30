@@ -170,6 +170,8 @@ export default {
     publicAiPlaceholder: "Ask AI (Public)",
     privateAiPlaceholder: "Ask AI (Private)",
     systemName: "Cat Speak Suggestion",
+    replyingTo: "Replying to",
+    reply: "Reply",
   },
   sessionActions: {
     connect11: "1:1 Connect",
