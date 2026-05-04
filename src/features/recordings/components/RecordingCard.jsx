@@ -13,6 +13,10 @@ import {
   formatFileSize,
   formatDate,
 } from "../utils/formatUtils"
+import { FaGoogleDrive } from "react-icons/fa"
+import { useGoogleLogin } from "@react-oauth/google"
+import { useUploadRecordingToDriveMutation } from "@/store/api/recordingsApi"
+import toast from "react-hot-toast"
 
 /**
  * RecordingCard — displays a single recording with metadata and action buttons.
@@ -33,6 +37,38 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
   const isCompleted = status === "completed"
   const isFailed = status === "failed"
   const hasFile = isCompleted && fileUrl
+  const isUploadedToDrive = status === "uploaded_to_drive"
+
+  const [uploadToDrive, { isLoading: isUploading }] = useUploadRecordingToDriveMutation()
+
+  const loginWithGoogle = useGoogleLogin({
+    scope: "https://www.googleapis.com/auth/drive.file",
+    onSuccess: async (tokenResponse) => {
+      const loadingToastId = toast.loading(
+        t?.recordings?.actions?.uploadingToDrive || "Đang tải lên Google Drive..."
+      )
+      try {
+        await uploadToDrive({
+          recordingId,
+          googleAccessToken: tokenResponse.access_token,
+        }).unwrap()
+        toast.success(
+          t?.recordings?.actions?.uploadDriveSuccess || "Đã lưu bản ghi vào Google Drive!",
+          { id: loadingToastId }
+        )
+      } catch (err) {
+        console.error("Upload to drive failed:", err)
+        toast.error(
+          err?.data?.message || t?.recordings?.actions?.uploadDriveFailed || "Tải lên thất bại",
+          { id: loadingToastId }
+        )
+      }
+    },
+    onError: (error) => {
+      console.error("Google Login failed", error)
+      toast.error(t?.recordings?.actions?.googleLoginFailed || "Đăng nhập Google thất bại")
+    },
+  })
 
   // In dev, rewrite R2 URLs to go through Vite's proxy to avoid CORS issues.
   // e.g. https://<account>.r2.cloudflarestorage.com/bucket/path → /r2/bucket/path
@@ -163,7 +199,9 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
           title={
             hasFile
               ? t?.recordings?.actions?.play || "Play recording"
-              : t?.recordings?.actions?.playUnavailable || "File not available"
+              : isUploadedToDrive
+                ? t?.recordings?.actions?.playDrive || "Xem trên Google Drive"
+                : t?.recordings?.actions?.playUnavailable || "File not available"
           }
           className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
             hasFile
@@ -181,8 +219,10 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
           title={
             hasFile
               ? t?.recordings?.actions?.download || "Download recording"
-              : t?.recordings?.actions?.downloadUnavailable ||
-                "File not available"
+              : isUploadedToDrive
+                ? t?.recordings?.actions?.downloadDrive || "Tải xuống từ Google Drive"
+                : t?.recordings?.actions?.downloadUnavailable ||
+                  "File not available"
           }
           className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
             hasFile
@@ -191,6 +231,32 @@ const RecordingCard = ({ recording, onPlay, onDelete, t }) => {
           }`}
         >
           <Download className="h-5 w-5" />
+        </button>
+
+        {/* Upload to Google Drive */}
+        <button
+          onClick={() => loginWithGoogle()}
+          disabled={!hasFile || isUploading || isUploadedToDrive}
+          title={
+            isUploadedToDrive
+              ? t?.recordings?.actions?.uploadedToDrive || "Đã lưu trên Google Drive"
+              : hasFile
+                ? t?.recordings?.actions?.uploadToDrive || "Tải lên Google Drive"
+                : t?.recordings?.actions?.uploadUnavailable || "File không có sẵn"
+          }
+          className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+            isUploadedToDrive
+              ? "bg-green-100 text-green-600"
+              : hasFile
+                ? "bg-[#F2F2F2] hover:bg-[#D9D9D9] text-gray-700 hover:text-blue-600"
+                : "bg-gray-50 text-gray-300 cursor-not-allowed"
+          }`}
+        >
+          {isUploading ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+          ) : (
+            <FaGoogleDrive className="h-5 w-5" />
+          )}
         </button>
 
         {/* Delete */}
