@@ -25,13 +25,16 @@ const ChatBox = ({
     aiMessages = [],
     receiveSystemMsgs,
     setReceiveSystemMsgs,
+    isChatCollapsed,
+    setIsChatCollapsed,
+    isAiCollapsed,
+    setIsAiCollapsed,
+    unreadRoomChat,
+    unreadAiChat,
   } = useGlobalVideoCall()
 
-  const [isChatCollapsed, setIsChatCollapsed] = useState(false)
   const [aiReplyTarget, setAiReplyTarget] = useState(null)
   const [roomReplyTarget, setRoomReplyTarget] = useState(null)
-
-  const [isAiCollapsed, setIsAiCollapsed] = useState(false)
   const [aiSplit, setAiSplit] = useState(50) // percentage (0-100)
   const containerRef = useRef(null)
   const dragRef = useRef({ isDragging: false, startY: 0, startSplit: 0 })
@@ -136,6 +139,11 @@ const ChatBox = ({
             <h3 className="text-sm">
               {t.rooms?.chatBox?.aiAssistant || "AI Assistant"}
             </h3>
+            {isAiCollapsed && unreadAiChat > 0 && (
+              <div className="ml-2 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-sm">
+                {unreadAiChat > 9 ? "9+" : unreadAiChat}
+              </div>
+            )}
             <div onClick={(e) => e.stopPropagation()} className="ml-auto">
               {settingsPopover}
             </div>
@@ -191,6 +199,11 @@ const ChatBox = ({
             <h3 className="text-sm">
               {t.rooms?.chatBox?.title || "Room Chat"}
             </h3>
+            {isChatCollapsed && unreadRoomChat > 0 && (
+              <div className="ml-2 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-sm">
+                {unreadRoomChat > 9 ? "9+" : unreadRoomChat}
+              </div>
+            )}
           </button>
           {!isChatCollapsed && (
             <>
