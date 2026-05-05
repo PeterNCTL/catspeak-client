@@ -1,4 +1,3 @@
-import { MapPin } from "lucide-react"
 import TextInput from "@/shared/components/ui/inputs/TextInput"
 import Dropdown from "@/shared/components/ui/Dropdown"
 import { useLanguage } from "@/shared/context/LanguageContext"
@@ -46,11 +45,28 @@ const EventDetailsSection = ({
       /^https?:\/\//i.test(loc) ||
       loc.includes("google.com/maps") ||
       loc.includes("maps.app.goo.gl")
-    const url = isUrl
-      ? loc.startsWith("http")
-        ? loc
-        : `https://${loc}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`
+
+    if (isUrl) {
+      const url = loc.startsWith("http") ? loc : `https://${loc}`
+      window.open(url, "_blank", "noopener,noreferrer")
+      return
+    }
+
+    // Construct the query with location, city, and country
+    let queryParts = [loc]
+
+    if (cityId) {
+      const selectedCity = cities.find((c) => c.id === cityId)
+      if (selectedCity) queryParts.push(selectedCity.name)
+    }
+
+    if (countryId) {
+      const selectedCountry = countries.find((c) => c.id === countryId)
+      if (selectedCountry) queryParts.push(selectedCountry.name)
+    }
+
+    const queryStr = queryParts.join(", ")
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryStr)}`
     window.open(url, "_blank", "noopener,noreferrer")
   }
 
@@ -91,6 +107,7 @@ const EventDetailsSection = ({
                 activeColor={eventColor}
                 className="w-full"
                 triggerClassName={`border ${errors.countryId ? "border-red-500" : "border-[#C6C6C6]"}`}
+                enableSearch
               />
               {errors.countryId && <span className="text-red-500 text-xs mt-1">{errors.countryId}</span>}
             </div>
@@ -105,12 +122,13 @@ const EventDetailsSection = ({
                 activeColor={eventColor}
                 className="w-full"
                 triggerClassName={`border ${errors.cityId ? "border-red-500" : "border-[#C6C6C6]"}`}
+                enableSearch
               />
               {errors.cityId && <span className="text-red-500 text-xs mt-1">{errors.cityId}</span>}
             </div>
           </div>
 
-          <div className="flex flex-col w-full relative">
+          <div className="flex flex-col w-full">
             <TextInput
               value={eventLocation}
               onChange={(e) => onLocationChange(e.target.value)}
@@ -118,17 +136,18 @@ const EventDetailsSection = ({
               variant="square"
               color={eventColor}
               containerClassName="w-full"
-              className="pr-10"
               error={errors.eventLocation}
             />
-            <button
-              type="button"
-              onClick={handleOpenMaps}
-              className="absolute right-3 top-2.5 text-gray-400 hover:text-[#B91264] transition-colors"
-              title={cal.openMaps}
-            >
-              <MapPin size={20} />
-            </button>
+            {eventLocation.trim() && (
+              <button
+                type="button"
+                onClick={handleOpenMaps}
+                className="text-sm mt-1.5 self-start hover:opacity-80 transition-opacity font-medium"
+                style={{ color: eventColor }}
+              >
+                {cal.openMaps}
+              </button>
+            )}
           </div>
         </div>
       </div>
