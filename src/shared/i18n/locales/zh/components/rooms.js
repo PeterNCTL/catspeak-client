@@ -214,7 +214,7 @@ export default {
       chat: "聊天",
     },
     backgroundsAndEffects: "背景和效果",
-    applyVisualEffects: "应用视觉效果",
+    applyVisualEffects: "更换背景",
     cameraOffWarning: "您的摄像头已关闭。选择效果将打开它。",
     recording: {
       stopTitle: "停止录制",
@@ -246,6 +246,11 @@ export default {
       you: "你",
       guest: "访客",
       youSuffix: "（你）",
+      volume: "音量",
+      unmute: "取消静音",
+      mute: "静音",
+      adjustVolume: "调整音量",
+      options: "选项",
     },
     webviewBlock: {
       title: "请在浏览器中打开",

@@ -224,8 +224,9 @@ export default {
       chat: "Trò chuyện",
     },
     backgroundsAndEffects: "Nền và hiệu ứng",
-    applyVisualEffects: "Áp dụng hiệu ứng hình ảnh",
-    cameraOffWarning: "Máy ảnh của bạn đang tắt. Việc chọn một hiệu ứng sẽ bật nó lên.",
+    applyVisualEffects: "Thay đổi phông nền",
+    cameraOffWarning:
+      "Máy ảnh của bạn đang tắt. Việc chọn một hiệu ứng sẽ bật nó lên.",
     recording: {
       stopTitle: "Dừng ghi hình",
       stopDescription:
@@ -256,6 +257,11 @@ export default {
       you: "Bạn",
       guest: "Khách",
       youSuffix: "(Bạn)",
+      volume: "Âm lượng",
+      unmute: "Bật tiếng",
+      mute: "Tắt tiếng",
+      adjustVolume: "Điều chỉnh âm lượng",
+      options: "Tùy chọn",
     },
     webviewBlock: {
       title: "Mở trong trình duyệt",
