@@ -182,10 +182,7 @@ const ChatBox = ({
         )}
 
         {/* Regular Chat Pane */}
-        <div
-          className="flex flex-col bg-white relative z-0"
-          style={chatStyle}
-        >
+        <div className="flex flex-col bg-white relative z-0" style={chatStyle}>
           <button
             type="button"
             onClick={() => setIsChatCollapsed(!isChatCollapsed)}
